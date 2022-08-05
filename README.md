@@ -7,7 +7,7 @@ The directory structure is as follows:
 <pre>
 .
 ├── Scratch         # Ideas and notes
-├── NavCOM          # VOR/Radio/ADF/XPNDR unit
+├── NavCom          # VOR/Radio/ADF/XPNDR unit
 │    ├── PCB
 │    ├── Case
 │    └── Software
