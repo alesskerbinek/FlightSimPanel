@@ -3,6 +3,10 @@ Flight simulator peripheral units
 
 More on the DokuWiki coming soon... or just here in [READMEs](NavCom/README.md)
 
+This is a test image to check whether adding images work
+
+<img src="/NavCom/PCB/v1.0_Bottom.PNG" width="500"/>
+
 The directory structure is as follows:
 <pre>
 .
