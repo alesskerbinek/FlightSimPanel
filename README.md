@@ -1,7 +1,8 @@
 # FlightSimPanel
 Flight simulator peripheral units
 
-More on the DokuWiki coming soon... or just here in READMEs. This is a test link to [NavCom](NavCom/) page. There you can read the datails about the directory contents. 
+More on the DokuWiki coming soon... or just here in READMEs. This is a test link to [NavCom](NavCom/) page. There you can read the datails about the directory contents.
+And there is a GitHub Wiki as well !!!!
 
 This is a test image to check whether adding images work
 
