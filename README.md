@@ -1,7 +1,7 @@
 # FlightSimPanel
 Flight simulator peripheral units
 
-More on the DokuWiki coming soon... or just here in [READMEs](NavCom/README.md)
+More on the DokuWiki coming soon... or just here in [READMEs](NavCom/)
 
 This is a test image to check whether adding images work
 
