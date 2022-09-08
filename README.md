@@ -1,7 +1,7 @@
 # FlightSimPanel
 Flight simulator peripheral units
 
-More on the DokuWiki coming soon...
+More on the DokuWiki coming soon... or just here in READMEs [a relative link](NavCom/README.md)
 
 The directory structure is as follows:
 <pre>
