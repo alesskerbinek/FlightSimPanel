@@ -8,18 +8,20 @@ The directory structure is as follows:
 .
 ├── Scratch         # Ideas and notes
 ├── Hardware
-│    ├── NavCom          # VOR/Radio/ADF/XPNDR unit
+│    ├── NavCom     # VOR/Radio/ADF/XPNDR unit
 │    │    ├── PCB
-│    │    └── Case
-│    ├── Audio           # Audio Panel unit
-│    │    ├── PCB
-│    │    └── Case
-│    └── Autopilot       # Autopilot Control unit
-│         ├── PCB
-│         └── Case
+│    │    └── Case*
+│    ├── Audio*     # Audio Panel unit
+│    │    ├── PCB*
+│    │    └── Case*
+│    └── Autopilot* # Autopilot Control unit
+│         ├── PCB*
+│         └── Case*
 └── Software
-     ├── NavCom          # VOR/Radio/ADF/XPNDR unit
-     ├── Common          # Common files
-     ├── Audio           # Audio Panel unit
-     └── Autopilot       # Autopilot Control unit
+     ├── NavCom     # VOR/Radio/ADF/XPNDR unit
+     ├── Common     # Common files
+     ├── Audio*     # Audio Panel unit
+     └── Autopilot* # Autopilot Control unit
+     
+* - TODO
 </pre>
