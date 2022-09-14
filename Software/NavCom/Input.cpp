@@ -1,0 +1,153 @@
+#include "Input.h"
+#include "ApplicationDefines.h"
+
+// -------------------------------------------------------------------------
+
+Input::Input()
+{
+    memset(m_auiButtonValues, 0, sizeof(m_auiButtonValues));
+}
+
+// -------------------------------------------------------------------------
+
+void Input::Initialize()
+{
+    m_pModel = ModelNavCom::GetInstance();
+
+    if(ROTARY_COUNT >= 2) {
+        m_abLastState[0] = digitalRead(ROT1_A);
+        m_abLastState[1] = digitalRead(ROT2_A);
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::Process()
+{
+    // TODO check rotaries, buttons and switches
+
+//    switch (m_pModel->GetUnitType()) {
+//    case utCOM:     ProcessCOM();   break;
+//    case utVOR:
+    ProcessVOR();   //break;
+//    case utADF:     ProcessADF();   break;
+//    case utXPNDR:   ProcessXPNDR(); break;
+//    default: break;
+//    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::ProcessVOR()
+{
+    CheckRotaries();
+    CheckButtons();
+}
+
+// -------------------------------------------------------------------------
+
+void Input::CheckButtons()
+{
+    if(m_uiUsedButtons <= BUTTON_COUNT)
+    {
+        for(uint8_t ui = 0; ui<m_uiUsedButtons; ui++)
+        {
+            if(digitalRead(m_auiButtonAddresses[ui]) == false) {
+                m_auiButtonValues[ui]++;
+            } else {
+                if(m_auiButtonValues[ui] > 50) {
+                    HandleButtonRelease(ui);
+                }
+                m_auiButtonValues[ui] = 0;
+            }
+        }
+    }
+
+    //Serial.printf("Analog: %03i, %03i\n", analogRead(ROT2_A), analogRead(ROT2_B));
+}
+
+// -------------------------------------------------------------------------
+
+void Input::CheckRotaries()
+{
+    if(ROTARY_COUNT >= 2)
+    {
+        bool bA1 = digitalRead(ROT1_A);
+        if(bA1 != m_abLastState[0] && bA1 == 1)
+        {
+            bool bB1 = digitalRead(ROT1_B);
+            if(bB1 != bA1) {
+                HandleRotaryScroll(0, 1);
+            } else {
+                HandleRotaryScroll(0, -1);
+            }
+        }
+
+        bool bA2 = digitalRead(ROT2_A);
+        if(bA2 != m_abLastState[1] && bA2 == 1)
+        {
+            bool bB2 = digitalRead(ROT2_B);
+            if(bB2 != bA2) {
+                HandleRotaryScroll(1, 1);
+            } else {
+                HandleRotaryScroll(1, -1);
+            }
+        }
+
+        m_abLastState[0] = bA1;
+        m_abLastState[1] = bA2;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
+{
+    // TODO switch unit type
+
+    if(iId == 0) {
+        if(m_pModel) {
+            if(m_bIsMHz) {
+                m_pModel->IncrStandbyValue(iDir*1000);
+            } else {
+                m_pModel->IncrStandbyValue(iDir*5);
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleButtonRelease(int8_t iId)
+{
+    // TODO switch unit type
+
+    switch (iId) {
+    case 0:
+        m_bIsMHz = !m_bIsMHz;
+        break;
+    case 1:
+        break;
+    case 2:
+        break;
+    case 3:
+        if(m_pModel) {
+            uint32_t uiTmp = m_pModel->GetActiveValue();
+            m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+            m_pModel->SetStandbyValue(uiTmp);
+            m_pModel->SaveSettings();
+            m_bIsMHz = false;
+        }
+        break;
+    case 4:
+        break;
+    case 5:
+        break;
+    case 6:
+        break;
+    default:
+        break;
+    }
+}
+
+// -------------------------------------------------------------------------
