@@ -80,6 +80,7 @@ bool ConfigPortNavCom::FactoryReset()
 {
     if(m_pModel) {
         m_pModel->GetSettings()->Initialize();
+        m_pModel->GetSettings()->Save();
         return true;
     }
 
