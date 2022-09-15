@@ -53,6 +53,9 @@ private:
     //! Rotary last state
     bool m_abLastState[ROTARY_COUNT];
 
+    //! Rotary change timestamp
+    uint32_t m_auiLastChange[ROTARY_COUNT];
+
     //! Actually used buttons in current unit
     uint8_t m_uiUsedButtons = BUTTON_COUNT;
 

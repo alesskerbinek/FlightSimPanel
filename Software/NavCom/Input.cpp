@@ -1,4 +1,5 @@
 #include "Input.h"
+#include "Helper.h"
 #include "ApplicationDefines.h"
 
 // -------------------------------------------------------------------------
@@ -17,6 +18,8 @@ void Input::Initialize()
     if(ROTARY_COUNT >= 2) {
         m_abLastState[0] = digitalRead(ROT1_A);
         m_abLastState[1] = digitalRead(ROT2_A);
+        m_auiLastChange[0] = helper::GetTime();
+        m_auiLastChange[1] = helper::GetTime();
     }
 }
 
@@ -72,30 +75,33 @@ void Input::CheckRotaries()
 {
     if(ROTARY_COUNT >= 2)
     {
-        bool bA1 = digitalRead(ROT1_A);
-        if(bA1 != m_abLastState[0] && bA1 == 1)
-        {
-            bool bB1 = digitalRead(ROT1_B);
-            if(bB1 != bA1) {
-                HandleRotaryScroll(0, 1);
-            } else {
-                HandleRotaryScroll(0, -1);
-            }
-        }
+        // In case rotary becomes erratic - jumping, try to increase minimum time difference since last change
 
-        bool bA2 = digitalRead(ROT2_A);
-        if(bA2 != m_abLastState[1] && bA2 == 1)
+        bool bB1 = digitalRead(ROT1_B);
+        if(bB1 != m_abLastState[0] && bB1 == 1 && helper::GetTimeDifference(m_auiLastChange[0]) > 50)
         {
-            bool bB2 = digitalRead(ROT2_B);
-            if(bB2 != bA2) {
+            bool bA1 = digitalRead(ROT1_A);
+            if(bA1 != bB1) {
+                HandleRotaryScroll(0, -1);
+            } else {
+                HandleRotaryScroll(0, 1);
+            }
+            m_auiLastChange[0] = helper::GetTime();
+        }
+        m_abLastState[0] = bB1;
+
+        bool bB2 = digitalRead(ROT2_B);
+        if(bB2 != m_abLastState[1] && bB2 == 1 && helper::GetTimeDifference(m_auiLastChange[1]) > 50)
+        {
+            bool bA2 = digitalRead(ROT2_A);
+            if(bA2 != bB2) {
                 HandleRotaryScroll(1, 1);
             } else {
                 HandleRotaryScroll(1, -1);
             }
+            m_auiLastChange[1] = helper::GetTime();
         }
-
-        m_abLastState[0] = bA1;
-        m_abLastState[1] = bA2;
+        m_abLastState[1] = bB2;
     }
 }
 
