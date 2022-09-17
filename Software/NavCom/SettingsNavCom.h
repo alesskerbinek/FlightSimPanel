@@ -69,7 +69,6 @@ protected:
 
         //! This unit type
         UnitTypes m_eUnitType = utUndefined;
-
 };
 
 #endif // SETTINGSNAVCOM_H

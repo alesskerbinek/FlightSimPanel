@@ -43,7 +43,7 @@ void ConfigPortNavCom::Process()
 
 void ConfigPortNavCom::GetProductionParameters(types::ProductionParameters* sParam)
 {
-    if(m_pModel) {
+    if(m_pModel && sParam) {
         sParam->m_iSerialNumber = m_pModel->GetSettings()->GetSerialNumber();
         sParam->m_iType = static_cast<uint8_t>(m_pModel->GetSettings()->GetUnitType());
     }
@@ -53,7 +53,7 @@ void ConfigPortNavCom::GetProductionParameters(types::ProductionParameters* sPar
 
 bool ConfigPortNavCom::SetProductionParameters(types::ProductionParameters* sParam)
 {
-    if(m_pModel == nullptr)
+    if(m_pModel == nullptr || sParam == nullptr)
         return false;
 
 //    m_pModel->GetSettings()->InitializeAll();

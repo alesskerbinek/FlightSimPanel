@@ -4,7 +4,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include "Model.h"
-#include "SettingsnavCom.h"
+#include "SettingsNavCom.h"
 
 class ModelNavCom : public Model
 {

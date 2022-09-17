@@ -110,7 +110,13 @@ typedef  struct {
     uint32_t uiActiveValue;     // 4 bytes
     uint32_t uiStandbyValue;    // 4 bytes
     uint8_t  uiUnitType;        // 1 byte
-    uint8_t auiFree[243];       // free space (sum of structure = 256 bytes)
+    char     acWiFiSSID[33];    // 33 bytes
+    char     acWiFiPass[33];    // 33 bytes
+    uint8_t  auiFree0;          // FREE SPACE
+    uint16_t uiUdpListenPort;   // 2 bytes
+    uint16_t uiUdpRemotePort;   // 2 bytes
+    uint32_t uiUdpRemoteIP;     // 4 bytes
+    uint8_t  auiFree[168];      // FREE SPACE (sum of structure = 256 bytes)
 } settings_t;
 
 //! Unit types
