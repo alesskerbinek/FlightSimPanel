@@ -21,7 +21,8 @@ public:
         sPMERR,
         sPINIT,
         sPSYS0,
-        sPFACT
+        sPFACT,
+        sPWIFI
     };
 
 protected:
@@ -68,6 +69,9 @@ protected:
     //! Parse NMEA sentence PFACT
     bool ParsePFACT();
 
+    //! Parse NMEA sentence PWIFI
+    bool ParsePWIFI();
+
     //! Get preprocessed field - fast access.
     const char* GetField(int i) const
     { return (i <= m_byFieldCount)? &m_acReceive[m_abyField[i]] : ""; }
@@ -83,6 +87,12 @@ protected:
 
     //! Performs Factory Reset. Reimplement in inherited class.
     virtual bool FactoryReset() = 0;
+
+    //! Returns ssid, passphrase, ip, ports, etc. Reimplement in inherited class.
+    virtual void GetNetworkParameters(types::NetworkParameters* sParam) = 0;
+
+    //! Sets ssid, passphrase, ip, ports, etc. Reimplement in inherited class.
+    virtual bool SetNetworkParameters(types::NetworkParameters* sParam) = 0;
 
 protected:
     //! Receive buffer.

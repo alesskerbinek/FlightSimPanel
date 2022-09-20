@@ -183,6 +183,11 @@ void ConfigPort::Parse()
             m_nmeaSentence = Sentence::sPFACT;
             return;
         }
+    } else if (strncmp(pcData, "PWIFI", 5) == 0) {
+        if (ParsePWIFI() == true) {
+            m_nmeaSentence = Sentence::sPWIFI;
+            return;
+        }
     }
 }
 
@@ -248,6 +253,45 @@ bool ConfigPort::ParsePFACT()
     if(strncmp(pB, "SET", 3) == 0){
         // Parse parameters
         if (FactoryReset()) {
+            Send("PMACK,OK", true);
+            return true;
+        }
+    }
+    Send("PMACK,ERROR,", true);
+    return false;
+}
+
+//-----------------------------------------------------------------------------
+
+bool ConfigPort::ParsePWIFI()
+{
+    const char* pB = GetField(1);
+
+    if(strncmp(pB, "GET", 3) == 0) {
+        types::NetworkParameters sParam;
+        GetNetworkParameters(&sParam);
+        std::array<char, MAX_NMEA_SIZE-1> acBuff;
+        snprintf(acBuff.data(), acBuff.size(), "PWIFI,SET,%s,%s,%i,%i.%i.%i.%i,%i",
+                                        sParam.m_acWiFiSSID,
+                                        sParam.m_acWiFiPass,
+                                        sParam.m_iUdpListenPort,
+                                        (sParam.m_uiUdpRemoteIP >> 24) & 0xFF,
+                                        (sParam.m_uiUdpRemoteIP >> 16) & 0xFF,
+                                        (sParam.m_uiUdpRemoteIP >> 8) & 0xFF,
+                                        sParam.m_uiUdpRemoteIP & 0xFF,
+                                        sParam.m_iUdpRemotePort);
+        Send(static_cast<const char*>(acBuff.data()), true);
+        return true;
+    }
+    else if(strncmp(pB, "SET", 3) == 0){
+        // Parse parameters
+        int32_t iUdpListenPort = helper::StrToInt(GetField(4), -1);
+        int32_t iUdpRemotePort = helper::StrToInt(GetField(5), -1);
+        uint32_t uiUdpRemoteIP = helper::StrToInt(GetField(6), 0);
+        // Write parameters in memory
+        types::NetworkParameters sParam = types::NetworkParameters(GetField(2), GetField(3),
+                                             iUdpListenPort, iUdpRemotePort, uiUdpRemoteIP);
+        if (SetNetworkParameters(&sParam)) {
             Send("PMACK,OK", true);
             return true;
         }

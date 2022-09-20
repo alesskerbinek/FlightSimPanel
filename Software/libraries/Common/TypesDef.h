@@ -62,31 +62,31 @@ struct NetworkParameters
     }
 
     NetworkParameters(
-            char*    acWiFiSSID,
-            char*    acWiFiPass,
-            uint16_t uiUdpListenPort,
-            uint16_t uiUdpRemotePort,
-            uint32_t uiUdpRemoteIP)
+            const char* acWiFiSSID,
+            const char* acWiFiPass,
+            int32_t  iUdpListenPort, // -1 = invalid value
+            int32_t  iUdpRemotePort, // -1 = invalid value
+            uint32_t uiUdpRemoteIP)  //  0 = invalid value
     {
         strncpy(m_acWiFiSSID, acWiFiSSID, sizeof(m_acWiFiSSID));
         strncpy(m_acWiFiPass, acWiFiPass, sizeof(m_acWiFiPass));
-        m_uiUdpListenPort = uiUdpListenPort;
-        m_uiUdpRemotePort = uiUdpRemotePort;
+        m_iUdpListenPort = iUdpListenPort;
+        m_iUdpRemotePort = iUdpRemotePort;
         m_uiUdpRemoteIP = uiUdpRemoteIP;
     }
 
     void Clear() {
         m_acWiFiSSID[0] = '\0';
         m_acWiFiPass[0] = '\0';
-        m_uiUdpListenPort = 0;
-        m_uiUdpRemotePort = 0;
+        m_iUdpListenPort = 0;
+        m_iUdpRemotePort = 0;
         m_uiUdpRemoteIP = 0;
     }
 
     char     m_acWiFiSSID[33];
     char     m_acWiFiPass[33];
-    uint16_t m_uiUdpListenPort;
-    uint16_t m_uiUdpRemotePort;
+    int32_t  m_iUdpListenPort;
+    int32_t  m_iUdpRemotePort;
     uint32_t m_uiUdpRemoteIP;
 };
 

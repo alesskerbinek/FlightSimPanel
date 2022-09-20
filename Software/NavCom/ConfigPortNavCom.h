@@ -34,6 +34,12 @@ protected:
     //! Performs Factory Reset
     virtual bool FactoryReset() override;
 
+    //! Returns ssid, passphrase, ip, ports, etc.
+    virtual void GetNetworkParameters(types::NetworkParameters* sParam) override;
+
+    //! Sets ssid, passphrase, ip, ports, etc.
+    virtual bool SetNetworkParameters(types::NetworkParameters* sParam) override;
+
 protected:
     //! Model pointer;
     ModelNavCom* m_pModel;

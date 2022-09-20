@@ -88,3 +88,38 @@ bool ConfigPortNavCom::FactoryReset()
 }
 
 // ----------------------------------------------------------------------------
+
+void ConfigPortNavCom::GetNetworkParameters(types::NetworkParameters* sParam)
+{
+    if(m_pModel && sParam) {
+        memcpy(sParam->m_acWiFiSSID, m_pModel->GetSettings()->GetWiFiSSID(), sizeof(sParam->m_acWiFiSSID));
+        memcpy(sParam->m_acWiFiPass, m_pModel->GetSettings()->GetWiFiPass(), sizeof(sParam->m_acWiFiPass));
+        sParam->m_iUdpListenPort = m_pModel->GetSettings()->GetListenPort();
+        sParam->m_iUdpRemotePort = m_pModel->GetSettings()->GetRemotePort();
+        sParam->m_uiUdpRemoteIP = m_pModel->GetSettings()->GetRemoteIP();
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+bool ConfigPortNavCom::SetNetworkParameters(types::NetworkParameters* sParam)
+{
+    if(m_pModel == nullptr || sParam == nullptr)
+        return false;
+
+    if(sParam->m_acWiFiSSID[0] != '\0') {
+        memcpy(m_pModel->GetSettings()->GetWiFiSSID(), sParam->m_acWiFiSSID, m_pModel->GetSettings()->GetWiFiSSIDSize());
+    }
+    if(sParam->m_acWiFiPass[0] != '\0') {
+        memcpy(m_pModel->GetSettings()->GetWiFiPass(), sParam->m_acWiFiPass, m_pModel->GetSettings()->GetWiFiPassSize());
+    }
+    if(sParam->m_iUdpListenPort >= 0) m_pModel->GetSettings()->SetListenPort(sParam->m_iUdpListenPort);
+    if(sParam->m_iUdpRemotePort >= 0) m_pModel->GetSettings()->SetRemotePort(sParam->m_iUdpRemotePort);
+    if(sParam->m_uiUdpRemoteIP > 0)   m_pModel->GetSettings()->SetRemoteIP(sParam->m_uiUdpRemoteIP);
+
+    m_pModel->SaveSettings();
+
+    return true;
+}
+
+// ----------------------------------------------------------------------------
