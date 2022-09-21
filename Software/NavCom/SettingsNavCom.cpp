@@ -44,7 +44,7 @@ void SettingsNavCom::Save()
     rSettings.uiUdpRemoteIP     = m_uiUdpRemoteIP;
     strncpy(rSettings.acWiFiSSID, m_acWiFiSSID, sizeof(rSettings.acWiFiSSID));
     strncpy(rSettings.acWiFiPass, m_acWiFiPass, sizeof(rSettings.acWiFiPass));
-	// IMPORTANT!!! When new setting is added, it has to be added here too
+    // IMPORTANT!!! When new setting is added, it has to be added here too
 
     // Clear the rest of settings - we assure initialization this way
     memset(rSettings.auiFree, 0, sizeof(rSettings.auiFree));
@@ -85,8 +85,8 @@ void SettingsNavCom::CopyToVariables(settings_t *pSettings)
     m_uiUdpListenPort   = pSettings->uiUdpListenPort;
     m_uiUdpRemotePort   = pSettings->uiUdpRemotePort;
     m_uiUdpRemoteIP     = pSettings->uiUdpRemoteIP;
-    strncpy(pSettings->acWiFiSSID, m_acWiFiSSID, sizeof(pSettings->acWiFiSSID));
-    strncpy(pSettings->acWiFiPass, m_acWiFiPass, sizeof(pSettings->acWiFiPass));
+    strncpy(m_acWiFiSSID, pSettings->acWiFiSSID, sizeof(m_acWiFiSSID));
+    strncpy(m_acWiFiPass, pSettings->acWiFiPass, sizeof(m_acWiFiPass));
     // IMPORTANT!!! When new setting is added, it has to be added here too
 }
 
