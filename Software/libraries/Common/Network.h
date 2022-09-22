@@ -47,6 +47,15 @@ protected:
     //! Parses received UDP datagrams
     virtual void ParseUDP(AsyncUDPPacket &packet);
 
+    //! Parses COM1 & COM2 frequency. Reimplement in inherited class.
+    virtual void ParseCOM(uint8_t* pBuffer) {}
+
+    //! Parses NAV1 & NAV2 frequency. Reimplement in inherited class.
+    virtual void ParseNAV(uint8_t* pBuffer) {}
+
+    //! Parses NAV1 & NAV2 OBS. Reimplement in inherited class.
+    virtual void ParseOBS(uint8_t* pBuffer) {}
+
 protected:
     //! Udp handler class
     AsyncUDP  AUdp;

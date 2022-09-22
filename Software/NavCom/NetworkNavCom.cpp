@@ -30,3 +30,49 @@ void NetworkNavCom::GetNetworkParameters(types::NetworkParameters* pParam)
 }
 
 // ----------------------------------------------------------------------------
+
+void NetworkNavCom::ParseCOM(uint8_t* pBuffer)
+{
+    float fValue = 0.0f;
+    memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));
+    //Serial.printf("Com1 act %i\n", int(fValue*10));
+    memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));
+    //Serial.printf("Com1 stb %i\n", int(fValue*10));
+
+    memcpy(&fValue, &(pBuffer[16]), sizeof(fValue));
+    //Serial.printf("Com2 act %i\n", int(fValue*10));
+    memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));
+    //Serial.printf("Com2 stb %i\n", int(fValue*10));
+}
+
+// ----------------------------------------------------------------------------
+
+void NetworkNavCom::ParseNAV(uint8_t* pBuffer)
+{
+    float fValue = 0.0f;
+    memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));
+    //Serial.printf("Nav1 act %i\n", int(fValue*10));
+    m_pModel->SetActiveValue(fValue*10);
+    memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));
+    //Serial.printf("Nav1 stb %i\n", int(fValue*10));
+    m_pModel->SetStandbyValue(fValue*10);
+
+    memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));
+    //Serial.printf("Nav2 act %i\n", int(fValue*10));
+    memcpy(&fValue, &(pBuffer[24]), sizeof(fValue));
+    //Serial.printf("Nav2 stb %i\n", int(fValue*10));
+}
+
+// ----------------------------------------------------------------------------
+
+void NetworkNavCom::ParseOBS(uint8_t* pBuffer)
+{
+    float fValue = 0.0f;
+    memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));
+    //Serial.printf("Nav1 obs %i\n", int(fValue*1000));
+
+    memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));
+    //Serial.printf("Nav2 obs %i\n", int(fValue*1000));
+}
+
+// ----------------------------------------------------------------------------

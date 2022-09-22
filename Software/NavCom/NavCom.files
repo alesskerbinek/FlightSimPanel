@@ -26,3 +26,4 @@ NetworkNavCom.h
 ..\libraries\Common\Settings.h
 ..\libraries\Common\Helper.h
 ..\libraries\Common\TypesDef.h
+..\libraries\Common\XPlaneDef.h

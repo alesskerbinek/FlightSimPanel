@@ -1,5 +1,6 @@
 #include <WiFi.h>
 #include "Helper.h"
+#include "XPlaneDef.h"
 #include "Network.h"
 
 // -------------------------------------------------------------------------
@@ -41,14 +42,23 @@ void Network::ConnectToWiFi(char* acSSID, char* acPass)
 
 void Network::ParseUDP(AsyncUDPPacket &packet)
 {
-    //Packet Type: packet.isBroadcast() packet.isMulticast()
-    //From: packet.remoteIP() packet.remotePort()
-    //To: packet.localIP()); packet.localPort());
-    //Len: packet.length());
-    //Data:
-    Serial.write(packet.data(), packet.length());
-
-
+    if(strncmp((char*)packet.data(), "DATA", 4) == 0) {
+        for(int i = 5; i < packet.length(); i += 4+8*4) {
+            switch (packet.data()[i]) {
+            case xplane::idComFreq:
+                ParseCOM(&packet.data()[i]);
+                break;
+            case xplane::idNavFreq:
+                ParseNAV(&packet.data()[i]);
+                break;
+            case xplane::idNavObs:
+                ParseOBS(&packet.data()[i]);
+                break;
+            default:
+                break;
+            }
+        }
+    }
 }
 
 // -------------------------------------------------------------------------

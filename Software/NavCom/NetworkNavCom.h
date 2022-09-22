@@ -19,6 +19,20 @@ public:
     //! Returns network parameters.
     virtual void GetNetworkParameters(types::NetworkParameters* pParam) override;
 
+protected:
+
+    //! Parses received UDP datagrams
+    //virtual void ParseUDP(AsyncUDPPacket &packet);
+
+    //! Parses COM1 & COM2 frequency
+    virtual void ParseCOM(uint8_t* pBuffer);
+
+    //! Parses NAV1 & NAV2 frequency
+    virtual void ParseNAV(uint8_t* pBuffer);
+
+    //! Parses NAV1 & NAV2 OBS
+    virtual void ParseOBS(uint8_t* pBuffer);
+
 private:
     //! Model pointer;
     ModelNavCom* m_pModel;
