@@ -118,6 +118,44 @@ inline int StrToInt(const char* pB, int iDefault = 0)
     return iDec;
 }
 
+// ---------------------------------------------------------------------
+
+/**
+* Function returning 32-bit integer value from given character array encoded
+* IP address.
+* The character array has to be in "x.x.x.x" format, where x is integer between
+* 0 and 255. In case the array is in wrong format or the conversion can not be
+* performed from any reason, value 0 is returned.
+* @param ASCII character encoded IP address.
+* @return Numeric value.
+*/
+inline uint32_t IPtoInt(const char* pSource)
+{
+    char acBuffer[16];
+    memcpy(acBuffer, pSource, sizeof(acBuffer));
+    uint32_t uiValue = 0;
+    uint8_t uiNextSegment = 0;
+    uint8_t uiCount = 0;
+    for(uint8_t i=0; i<sizeof(acBuffer); i++) {
+        bool bBreakAfter = acBuffer[i] == '\0';
+        if(acBuffer[i] == '.' || bBreakAfter) {
+            int v = strtoul(&acBuffer[uiNextSegment], NULL, 10);
+            uiValue += (v << ((3-uiCount)*8));
+            uiNextSegment=i+1;
+            acBuffer[i] = '\0';
+            uiCount++;
+            if(bBreakAfter) {
+                break;
+            }
+        }
+    }
+    if(uiCount != 4) {
+        return 0;
+    } else {
+        return uiValue;
+    }
+}
+
 // --------------------------------------------------------------------
 
 /**

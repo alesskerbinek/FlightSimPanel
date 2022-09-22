@@ -286,8 +286,9 @@ bool ConfigPort::ParsePWIFI()
     else if(strncmp(pB, "SET", 3) == 0){
         // Parse parameters
         int32_t iUdpListenPort = helper::StrToInt(GetField(4), -1);
-        int32_t iUdpRemotePort = helper::StrToInt(GetField(5), -1);
-        uint32_t uiUdpRemoteIP = helper::StrToInt(GetField(6), 0);
+        int32_t iUdpRemotePort = helper::StrToInt(GetField(6), -1);
+        uint32_t uiUdpRemoteIP = helper::IPtoInt(GetField(5));
+
         // Write parameters in memory
         types::NetworkParameters sParam = types::NetworkParameters(GetField(2), GetField(3),
                                              iUdpListenPort, iUdpRemotePort, uiUdpRemoteIP);
