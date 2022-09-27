@@ -1,6 +1,5 @@
 #include <WiFi.h>
 #include "Helper.h"
-#include "XPlaneDef.h"
 #include "Network.h"
 
 // -------------------------------------------------------------------------
@@ -22,10 +21,8 @@ void Network::Initialize()
 
 // -------------------------------------------------------------------------
 
-void Network::Send(uint8_t *auiBuffer, uint16_t uiSize, IPAddress ipAddress, uint16_t uiPort)
+void Network::Send(const uint8_t *auiBuffer, uint16_t uiSize, IPAddress ipAddress, uint16_t uiPort)
 {
-    //m_sParams.m_uiUdpRemoteIP, m_sParams.m_iUdpRemotePort
-
     if(IsConnected()) {
         AUdp.writeTo(auiBuffer, uiSize, ipAddress, uiPort);
     }
@@ -106,6 +103,7 @@ void Network::Process()
             m_eState = nsConnectWiFi;
             m_uiLastStateChange = helper::GetTime();
         }
+        ProcessTxQueue();
         break;
     case nsListenError:
         // Nothing to be done. Wait for system reset... ???
@@ -113,6 +111,109 @@ void Network::Process()
     default:
         break;
     }
+}
+
+// -------------------------------------------------------------------------
+
+void Network::ProcessTxQueue()
+{
+    if(m_qTX.empty() == false)
+    {
+        xplane::UdpDatagram sDatagram = m_qTX.front();
+        m_qTX.pop();
+
+        switch (sDatagram.m_eType) {
+        case xplane::dtDATA:
+            // Implement if needed...
+            break;
+        case xplane::dtDREF:
+            SendDataRef(sDatagram.m_uiValue, static_cast<xplane::DataRefs>(sDatagram.m_uiParameter));
+            break;
+        case xplane::dtCHAR:
+            SendChar(sDatagram.m_uiValue & 0xFF);
+            break;
+        case xplane::dtCMND:
+            SendCommand(static_cast<xplane::Commands>(sDatagram.m_uiParameter));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+const char* Network::GetDataRefString(xplane::DataRefs dr)
+{
+    switch (dr) {
+    case xplane::drCom1Freq:
+        return "/sim/cockpit2/radios/actuators/com1_standby_frequency_hz[0]";
+    default:
+        return nullptr;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+const char* Network::GetCommandString(xplane::Commands cmd)
+{
+    switch (cmd) {
+    case xplane::cmLandingGear:
+        return "/sim/flight_controls/landing_gear_down";
+    default:
+        return nullptr;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Network::SendDataRef(uint32_t uiValue, xplane::DataRefs eType)
+{
+    const char* pText = GetDataRefString(eType);
+    if(pText) {
+        char acBuffer[509];
+        strncpy(acBuffer, "DREF0", 5);
+
+        memcpy(&acBuffer[5], &uiValue, 4);
+
+        memset(&acBuffer[9], 0x20, sizeof(acBuffer)-9);
+        strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9);
+
+        Send((const uint8_t*)acBuffer, 509, IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Network::SendChar(uint8_t uiValue)
+{
+    char acBuffer[6];
+    strncpy(acBuffer, "CHAR0", 5);
+    acBuffer[5] = uiValue;
+
+    Send((const uint8_t*)acBuffer, 6, IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+}
+
+// -------------------------------------------------------------------------
+
+void Network::SendCommand(xplane::Commands eType)
+{
+    const char* pText = GetCommandString(eType);
+    if(pText) {
+        char acBuffer[100];
+        strncpy(acBuffer, "CMND0", 5);
+
+        strncpy(&acBuffer[5], pText, sizeof(acBuffer)-5);
+
+        Send((const uint8_t*)acBuffer, strlen(acBuffer), IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Network::AddToTxQueue(xplane::UdpDatagram data)
+{
+    m_qTX.push(data);
 }
 
 // -------------------------------------------------------------------------
