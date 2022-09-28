@@ -1,8 +1,11 @@
 #ifndef MODEL_H
 #define MODEL_H
 
+#include <queue>
+#include <cstring>
 #include <stdint.h>
 #include <stddef.h>
+#include "XPlaneDef.h"
 #include "Settings.h"
 
 class Model
@@ -42,7 +45,26 @@ public:
     //! Sets current main process loop count
     void SetLoopCount(uint32_t uiValue)
     {   m_uiLoopCnt = uiValue; }
-    
+
+    /**
+     * @brief Adds given datagram to transmit queue
+     * @param data datagram to be put on queue.
+     */
+    void AddToTxQueue(xplane::UdpDatagram data);
+
+    /**
+    @brief Returns the oldest datagram from transmit queue (FIFO).
+    @return The oldest datagram
+    */
+    xplane::UdpDatagram GetFromTxQueue();
+
+    /**
+     * @brief Returns true if tx queue is empty.
+     * @return true if empty
+     */
+    bool IsTxQueueEmpty() const
+    {   return m_qTX.empty(); }
+
 protected:
     //! The only static singleton object.
     static Model* s_pInstance;
@@ -52,6 +74,9 @@ protected:
 
     //! Main Process loop counter.
     uint32_t m_uiLoopCnt;
+
+    //! UDP Transmit queue.
+    std::queue<xplane::UdpDatagram> m_qTX;
 };
 
 #endif // MODEL_H

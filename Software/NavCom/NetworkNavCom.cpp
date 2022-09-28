@@ -76,3 +76,30 @@ void NetworkNavCom::ParseOBS(uint8_t* pBuffer)
 }
 
 // ----------------------------------------------------------------------------
+
+void NetworkNavCom::ProcessTxQueue()
+{
+    if(m_pModel && m_pModel->IsTxQueueEmpty() == false)
+    {
+        xplane::UdpDatagram sDatagram = m_pModel->GetFromTxQueue();
+
+        switch (sDatagram.m_eType) {
+        case xplane::dtDATA:
+            // Implement if needed...
+            break;
+        case xplane::dtDREF:
+            SendDataRef(sDatagram.m_uiValue, static_cast<xplane::DataRefs>(sDatagram.m_uiParameter));
+            break;
+        case xplane::dtCHAR:
+            SendChar(sDatagram.m_uiValue & 0xFF);
+            break;
+        case xplane::dtCMND:
+            SendCommand(static_cast<xplane::Commands>(sDatagram.m_uiParameter));
+            break;
+        default:
+            break;
+        }
+    }
+}
+
+// -------------------------------------------------------------------------

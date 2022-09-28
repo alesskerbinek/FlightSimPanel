@@ -24,6 +24,7 @@ void Network::Initialize()
 void Network::Send(const uint8_t *auiBuffer, uint16_t uiSize, IPAddress ipAddress, uint16_t uiPort)
 {
     if(IsConnected()) {
+        //Serial.printf("Send %s, %i\n", (const char*)auiBuffer, uiSize);
         AUdp.writeTo(auiBuffer, uiSize, ipAddress, uiPort);
     }
 }
@@ -115,39 +116,17 @@ void Network::Process()
 
 // -------------------------------------------------------------------------
 
-void Network::ProcessTxQueue()
-{
-    if(m_qTX.empty() == false)
-    {
-        xplane::UdpDatagram sDatagram = m_qTX.front();
-        m_qTX.pop();
-
-        switch (sDatagram.m_eType) {
-        case xplane::dtDATA:
-            // Implement if needed...
-            break;
-        case xplane::dtDREF:
-            SendDataRef(sDatagram.m_uiValue, static_cast<xplane::DataRefs>(sDatagram.m_uiParameter));
-            break;
-        case xplane::dtCHAR:
-            SendChar(sDatagram.m_uiValue & 0xFF);
-            break;
-        case xplane::dtCMND:
-            SendCommand(static_cast<xplane::Commands>(sDatagram.m_uiParameter));
-            break;
-        default:
-            break;
-        }
-    }
-}
-
-// -------------------------------------------------------------------------
-
 const char* Network::GetDataRefString(xplane::DataRefs dr)
 {
     switch (dr) {
+    case xplane::drNav1StandbyHz:
+        return "sim/cockpit2/radios/actuators/nav_frequency_hz";
+    case xplane::drNav1StandbyMHz:
+        return "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz";
+    case xplane::drNav1StandbykHz:
+        return "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz";
     case xplane::drCom1Freq:
-        return "/sim/cockpit2/radios/actuators/com1_standby_frequency_hz[0]";
+        return "/sim/cockpit2/radios/actuators/com1_standby_frequency_hz[0]"; // ???
     default:
         return nullptr;
     }
@@ -158,8 +137,30 @@ const char* Network::GetDataRefString(xplane::DataRefs dr)
 const char* Network::GetCommandString(xplane::Commands cmd)
 {
     switch (cmd) {
+    case xplane::cmNav1Flip:
+        return "sim/radios/nav1_standy_flip";
+    case xplane::cmNav2Flip:
+        return "sim/radios/nav2_standy_flip";
+    case xplane::cmCom1Flip:
+        return "sim/radios/com1_standy_flip";
+    case xplane::cmCom2Flip:
+        return "sim/radios/com2_standy_flip";
+    case xplane::cmAdf1Flip:
+        return "sim/radios/adf1_standy_flip";
+    case xplane::cmAdf2Flip:
+        return "sim/radios/adf2_standy_flip";
+    case xplane::cmDmeFlip:
+        return "sim/radios/dme_standy_flip";
+    case xplane::cmNav1StandbyCoarseUp:
+        return "sim/radios/stby_nav1_coarse_up";
+    case xplane::cmNav1StandbyCoarseDown:
+        return "sim/radios/stby_nav1_coarse_down";
+    case xplane::cmNav1StandbyFineUp:
+        return "sim/radios/stby_nav1_fine_up";
+    case xplane::cmNav1StandbyFineDown:
+        return "sim/radios/stby_nav1_fine_down";
     case xplane::cmLandingGear:
-        return "/sim/flight_controls/landing_gear_down";
+        return "/sim/flight_controls/landing_gear_down"; // ???
     default:
         return nullptr;
     }
@@ -179,7 +180,13 @@ void Network::SendDataRef(uint32_t uiValue, xplane::DataRefs eType)
         memset(&acBuffer[9], 0x20, sizeof(acBuffer)-9);
         strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9);
 
-        Send((const uint8_t*)acBuffer, 509, IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+        acBuffer[508] = '\0'; // I'm not sure about this.... ???????????????????????????????????????????????????????????????????????????
+
+        IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
+                                        (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
+                                        (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
+                                        m_sParams.m_uiUdpRemoteIP & 0xFF);
+        Send((const uint8_t*)acBuffer, 509, ipAddress, m_sParams.m_iUdpRemotePort);
     }
 }
 
@@ -191,7 +198,12 @@ void Network::SendChar(uint8_t uiValue)
     strncpy(acBuffer, "CHAR0", 5);
     acBuffer[5] = uiValue;
 
-    Send((const uint8_t*)acBuffer, 6, IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+
+    IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
+                                    (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
+                                    (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
+                                    m_sParams.m_uiUdpRemoteIP & 0xFF);
+    Send((const uint8_t*)acBuffer, 6, ipAddress, m_sParams.m_iUdpRemotePort);
 }
 
 // -------------------------------------------------------------------------
@@ -205,15 +217,12 @@ void Network::SendCommand(xplane::Commands eType)
 
         strncpy(&acBuffer[5], pText, sizeof(acBuffer)-5);
 
-        Send((const uint8_t*)acBuffer, strlen(acBuffer), IPAddress(m_sParams.m_uiUdpRemoteIP), m_sParams.m_iUdpRemotePort);
+        IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
+                                        (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
+                                        (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
+                                        m_sParams.m_uiUdpRemoteIP & 0xFF);
+        Send((const uint8_t*)acBuffer, strlen(acBuffer)+1, ipAddress, m_sParams.m_iUdpRemotePort);
     }
-}
-
-// -------------------------------------------------------------------------
-
-void Network::AddToTxQueue(xplane::UdpDatagram data)
-{
-    m_qTX.push(data);
 }
 
 // -------------------------------------------------------------------------

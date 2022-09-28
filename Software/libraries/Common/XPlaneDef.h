@@ -35,6 +35,9 @@ enum DataId {
  */
 enum DataRefs {
     drUndefined = 0,
+    drNav1StandbyHz,
+    drNav1StandbyMHz,
+    drNav1StandbykHz,
     drCom1Freq,
 };
 
@@ -45,6 +48,17 @@ enum DataRefs {
  */
 enum Commands {
     cmUndefined = 0,
+    cmNav1Flip,
+    cmNav2Flip,
+    cmCom1Flip,
+    cmCom2Flip,
+    cmAdf1Flip,
+    cmAdf2Flip,
+    cmDmeFlip,
+    cmNav1StandbyCoarseUp,
+    cmNav1StandbyCoarseDown,
+    cmNav1StandbyFineUp,
+    cmNav1StandbyFineDown,
     cmLandingGear,
 };
 

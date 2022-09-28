@@ -28,3 +28,19 @@ Model* Model::GetInstance()
 
 // -------------------------------------------------------------------------
 
+void Model::AddToTxQueue(xplane::UdpDatagram data)
+{
+    m_qTX.push(data);
+}
+
+// -------------------------------------------------------------------------
+
+xplane::UdpDatagram Model::GetFromTxQueue()
+{
+    xplane::UdpDatagram sDatagram = m_qTX.front();
+    m_qTX.pop();
+
+    return sDatagram;
+}
+
+// -------------------------------------------------------------------------

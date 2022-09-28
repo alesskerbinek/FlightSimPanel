@@ -1,8 +1,6 @@
 #ifndef NETWORK_H
 #define NETWORK_H
 
-#include <queue>
-#include <cstring>
 #include <WiFiUdp.h>
 #include "AsyncUDP.h"
 #include <WiFiServer.h>
@@ -40,12 +38,6 @@ public:
     //! Get network parameters from settings. Reimplement in inherited class.
     virtual void GetNetworkParameters(types::NetworkParameters* sParam) = 0;
 
-    /**
-     * @brief Adds given datagram to transmit queue
-     * @param data datagram to be put on queue.
-     */
-    void AddToTxQueue(xplane::UdpDatagram data);
-
 protected:
     //! Send UDP datagram to given station
     virtual void Send(const uint8_t *auiBuffer, uint16_t uiSize, IPAddress ipAddress, uint16_t uiPort);
@@ -70,39 +62,40 @@ protected:
     * @param dr DataRef type
     * @return DataRef text
     */
-    const char* GetDataRefString(xplane::DataRefs dr);
+    virtual const char* GetDataRefString(xplane::DataRefs dr);
 
     /**
      * @brief Returns text representation for given Command type.
      * @param cmd Command type
      * @return Command text
      */
-    const char* GetCommandString(xplane::Commands cmd);
+    virtual const char* GetCommandString(xplane::Commands cmd);
 
     /**
      * @brief Constructs DREF datagram from given attributes.
      * @param uiValue 4 byte value
      * @param eType DataRef type
      */
-    void SendDataRef(uint32_t uiValue, xplane::DataRefs eType);
+    virtual void SendDataRef(uint32_t uiValue, xplane::DataRefs eType);
 
     /**
      * @brief Contructs CHAR datagram with given value
      * @param uiValue keyboard key character
      */
-    void SendChar(uint8_t uiValue);
+    virtual void SendChar(uint8_t uiValue);
 
     /**
      * @brief Constructs CMND datagram with given type.
      * @param eType Command type
      */
-    void SendCommand(xplane::Commands eType);
+    virtual void SendCommand(xplane::Commands eType);
 
     /**
      * @brief Function checks whether there are messages in Tx queue that need to be sent.
      * Sends the oldest datagram in the queue (FIFO).
+     * Reimplement in inherited class.
      */
-    void ProcessTxQueue();
+    virtual void ProcessTxQueue() = 0;
 
 
 protected:
@@ -117,9 +110,6 @@ protected:
 
     //! Strucure holding network settings
     types::NetworkParameters m_sParams;
-
-    //! UDP Transmit queue.
-    std::queue<xplane::UdpDatagram> m_qTX;
 };
 
 #endif // NETWORK_H

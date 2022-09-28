@@ -33,6 +33,12 @@ protected:
     //! Parses NAV1 & NAV2 OBS
     virtual void ParseOBS(uint8_t* pBuffer);
 
+    /**
+     * @brief Function checks whether there are messages in Tx queue that need to be sent.
+     * Sends the oldest datagram in the queue (FIFO).
+     */
+    virtual void ProcessTxQueue() override;
+
 private:
     //! Model pointer;
     ModelNavCom* m_pModel;

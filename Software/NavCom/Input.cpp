@@ -1,5 +1,6 @@
 #include "Input.h"
 #include "Helper.h"
+#include "XPlaneDef.h"
 #include "ApplicationDefines.h"
 
 // -------------------------------------------------------------------------
@@ -114,9 +115,11 @@ void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
     if(iId == 0) {
         if(m_pModel) {
             if(m_bIsMHz) {
-                m_pModel->IncrStandbyValue(iDir*1000);
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1StandbyCoarseUp));
+                //m_pModel->IncrStandbyValue(iDir*1000);
             } else {
-                m_pModel->IncrStandbyValue(iDir*5);
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1StandbyFineUp));
+                //m_pModel->IncrStandbyValue(iDir*5);
             }
         }
     }
@@ -128,6 +131,12 @@ void Input::HandleButtonRelease(int8_t iId)
 {
     // TODO switch unit type
 
+    /*
+    AddToTxQueue(UdpDatagram(UdpDataType::dtDREF, DataRefs::drCom1Freq, (uint32_t)0x462AA001));
+    AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
+    AddToTxQueue(UdpDatagram(UdpDataType::dtCMND, Commands::cmLandingGear));
+    */
+
     switch (iId) {
     case 0:
         m_bIsMHz = !m_bIsMHz;
@@ -138,10 +147,12 @@ void Input::HandleButtonRelease(int8_t iId)
         break;
     case 3:
         if(m_pModel) {
-            uint32_t uiTmp = m_pModel->GetActiveValue();
-            m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
-            m_pModel->SetStandbyValue(uiTmp);
-            m_pModel->SaveSettings();
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1Flip));
+
+            //uint32_t uiTmp = m_pModel->GetActiveValue();
+            //m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+            //m_pModel->SetStandbyValue(uiTmp);
+            //m_pModel->SaveSettings();
             m_bIsMHz = false;
         }
         break;
