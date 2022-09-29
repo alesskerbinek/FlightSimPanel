@@ -59,7 +59,15 @@ enum Commands {
     cmNav1StandbyCoarseDown,
     cmNav1StandbyFineUp,
     cmNav1StandbyFineDown,
+    cmCom1StandbyCoarseUp,
+    cmCom1StandbyCoarseDown,
+    cmCom1StandbyFineUp,
+    cmCom1StandbyFineDown,
+    cmCom1Standby833Up,
+    cmCom1Standby833Down,
     cmLandingGear,
+    cmFlapsUp,
+    cmFlapsDown,
 };
 
 // --------------------------------------------------------------------

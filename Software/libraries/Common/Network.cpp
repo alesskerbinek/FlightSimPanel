@@ -138,7 +138,7 @@ const char* Network::GetCommandString(xplane::Commands cmd)
 {
     switch (cmd) {
     case xplane::cmNav1Flip:
-        return "sim/radios/nav1_standy_flip";
+        return "sim/radios/nav1_standy_flip";           // OK
     case xplane::cmNav2Flip:
         return "sim/radios/nav2_standy_flip";
     case xplane::cmCom1Flip:
@@ -152,15 +152,31 @@ const char* Network::GetCommandString(xplane::Commands cmd)
     case xplane::cmDmeFlip:
         return "sim/radios/dme_standy_flip";
     case xplane::cmNav1StandbyCoarseUp:
-        return "sim/radios/stby_nav1_coarse_up";
+        return "sim/radios/stby_nav1_coarse_up";        // OK
     case xplane::cmNav1StandbyCoarseDown:
-        return "sim/radios/stby_nav1_coarse_down";
+        return "sim/radios/stby_nav1_coarse_down";      // OK
     case xplane::cmNav1StandbyFineUp:
-        return "sim/radios/stby_nav1_fine_up";
+        return "sim/radios/stby_nav1_fine_up";          // OK
     case xplane::cmNav1StandbyFineDown:
-        return "sim/radios/stby_nav1_fine_down";
+        return "sim/radios/stby_nav1_fine_down";        // OK
+    case xplane::cmCom1StandbyCoarseUp:
+        return "sim/radios/stby_com1_coarse_up";
+    case xplane::cmCom1StandbyCoarseDown:
+        return "sim/radios/stby_com1_coarse_down";
+    case xplane::cmCom1StandbyFineUp:
+        return "sim/radios/stby_com1_fine_up";          // OK
+    case xplane::cmCom1StandbyFineDown:
+        return "sim/radios/stby_com1_fine_down";
+    case xplane::cmCom1Standby833Up:
+        return "sim/radios/stby_com1_fine_up_833";      // OK
+    case xplane::cmCom1Standby833Down:
+        return "sim/radios/stby_com1_fine_down_833";
     case xplane::cmLandingGear:
-        return "/sim/flight_controls/landing_gear_down"; // ???
+        return "sim/flight_controls/landing_gear_down";
+    case xplane::cmFlapsUp:
+        return "sim/flight_controls/flaps_up";          // OK
+    case xplane::cmFlapsDown:
+        return "sim/flight_controls/flaps_down";
     default:
         return nullptr;
     }
@@ -173,14 +189,12 @@ void Network::SendDataRef(uint32_t uiValue, xplane::DataRefs eType)
     const char* pText = GetDataRefString(eType);
     if(pText) {
         char acBuffer[509];
-        strncpy(acBuffer, "DREF0", 5);
+        strncpy(acBuffer, "DREF\0", 5);
 
         memcpy(&acBuffer[5], &uiValue, 4);
 
         memset(&acBuffer[9], 0x20, sizeof(acBuffer)-9);
-        strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9);
-
-        acBuffer[508] = '\0'; // I'm not sure about this.... ???????????????????????????????????????????????????????????????????????????
+        strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9); // This text has to be NULL terminated ???????????????????????????????????????????????????????????????????????????
 
         IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
                                         (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
@@ -195,9 +209,8 @@ void Network::SendDataRef(uint32_t uiValue, xplane::DataRefs eType)
 void Network::SendChar(uint8_t uiValue)
 {
     char acBuffer[6];
-    strncpy(acBuffer, "CHAR0", 5);
+    strncpy(acBuffer, "CHAR\0", 5);
     acBuffer[5] = uiValue;
-
 
     IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
                                     (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
@@ -213,7 +226,8 @@ void Network::SendCommand(xplane::Commands eType)
     const char* pText = GetCommandString(eType);
     if(pText) {
         char acBuffer[100];
-        strncpy(acBuffer, "CMND0", 5);
+        strncpy(acBuffer, "CMND\0", 5);
+        //acBuffer[4] = '\0';
 
         strncpy(&acBuffer[5], pText, sizeof(acBuffer)-5);
 
@@ -221,7 +235,7 @@ void Network::SendCommand(xplane::Commands eType)
                                         (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
                                         (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
                                         m_sParams.m_uiUdpRemoteIP & 0xFF);
-        Send((const uint8_t*)acBuffer, strlen(acBuffer)+1, ipAddress, m_sParams.m_iUdpRemotePort);
+        Send((const uint8_t*)acBuffer, 5+strlen(pText)+1, ipAddress, m_sParams.m_iUdpRemotePort);
     }
 }
 
