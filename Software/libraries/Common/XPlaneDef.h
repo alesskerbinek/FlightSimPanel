@@ -38,7 +38,8 @@ enum DataRefs {
     drNav1StandbyHz,
     drNav1StandbyMHz,
     drNav1StandbykHz,
-    drCom1Freq,
+    drCom1ActiveFreq,
+    drCom1StandbyFreq,
 };
 
 // --------------------------------------------------------------------

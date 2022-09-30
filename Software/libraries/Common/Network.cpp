@@ -57,6 +57,11 @@ void Network::ParseUDP(AsyncUDPPacket &packet)
             }
         }
     }
+    else if(strncmp((char*)packet.data(), "DREF", 4) == 0) {
+        // X-Plane has a bug. When you enable and/or change which dataref are to be output
+        // you have to reboot simulator otherwise the value is always 0.
+        ParseDREF(packet.data());
+    }
 }
 
 // -------------------------------------------------------------------------
@@ -125,8 +130,10 @@ const char* Network::GetDataRefString(xplane::DataRefs dr)
         return "sim/cockpit2/radios/actuators/nav1_standby_frequency_Mhz";
     case xplane::drNav1StandbykHz:
         return "sim/cockpit2/radios/actuators/nav1_standby_frequency_khz";
-    case xplane::drCom1Freq:
-        return "/sim/cockpit2/radios/actuators/com1_standby_frequency_hz[0]"; // ???
+    case xplane::drCom1ActiveFreq:
+        return "sim/cockpit2/radios/actuators/com1_frequency_hz_833";           // OK
+    case xplane::drCom1StandbyFreq:
+        return "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833";   // OK
     default:
         return nullptr;
     }
@@ -142,7 +149,7 @@ const char* Network::GetCommandString(xplane::Commands cmd)
     case xplane::cmNav2Flip:
         return "sim/radios/nav2_standy_flip";
     case xplane::cmCom1Flip:
-        return "sim/radios/com1_standy_flip";
+        return "sim/radios/com1_standy_flip";           // OK
     case xplane::cmCom2Flip:
         return "sim/radios/com2_standy_flip";
     case xplane::cmAdf1Flip:
@@ -166,11 +173,11 @@ const char* Network::GetCommandString(xplane::Commands cmd)
     case xplane::cmCom1StandbyFineUp:
         return "sim/radios/stby_com1_fine_up";          // OK
     case xplane::cmCom1StandbyFineDown:
-        return "sim/radios/stby_com1_fine_down";
+        return "sim/radios/stby_com1_fine_down";        // OK
     case xplane::cmCom1Standby833Up:
         return "sim/radios/stby_com1_fine_up_833";      // OK
     case xplane::cmCom1Standby833Down:
-        return "sim/radios/stby_com1_fine_down_833";
+        return "sim/radios/stby_com1_fine_down_833";    // OK
     case xplane::cmLandingGear:
         return "sim/flight_controls/landing_gear_down";
     case xplane::cmFlapsUp:
@@ -194,12 +201,9 @@ void Network::SendDataRef(uint32_t uiValue, xplane::DataRefs eType)
         memcpy(&acBuffer[5], &uiValue, 4);
 
         memset(&acBuffer[9], 0x20, sizeof(acBuffer)-9);
-        strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9); // This text has to be NULL terminated ???????????????????????????????????????????????????????????????????????????
+        strncpy(&acBuffer[9], pText, sizeof(acBuffer)-9); // pText has to be NULL terminated
 
-        IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
-                                        (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
-                                        (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
-                                        m_sParams.m_uiUdpRemoteIP & 0xFF);
+        IPAddress ipAddress = helper::GetIPAddress(m_sParams.m_uiUdpRemoteIP);
         Send((const uint8_t*)acBuffer, 509, ipAddress, m_sParams.m_iUdpRemotePort);
     }
 }
@@ -212,10 +216,7 @@ void Network::SendChar(uint8_t uiValue)
     strncpy(acBuffer, "CHAR\0", 5);
     acBuffer[5] = uiValue;
 
-    IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
-                                    (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
-                                    (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
-                                    m_sParams.m_uiUdpRemoteIP & 0xFF);
+    IPAddress ipAddress = helper::GetIPAddress(m_sParams.m_uiUdpRemoteIP);
     Send((const uint8_t*)acBuffer, 6, ipAddress, m_sParams.m_iUdpRemotePort);
 }
 
@@ -231,10 +232,7 @@ void Network::SendCommand(xplane::Commands eType)
 
         strncpy(&acBuffer[5], pText, sizeof(acBuffer)-5);
 
-        IPAddress ipAddress = IPAddress((m_sParams.m_uiUdpRemoteIP >> 24) & 0xFF,
-                                        (m_sParams.m_uiUdpRemoteIP >> 16) & 0xFF,
-                                        (m_sParams.m_uiUdpRemoteIP >> 8) & 0xFF,
-                                        m_sParams.m_uiUdpRemoteIP & 0xFF);
+        IPAddress ipAddress = helper::GetIPAddress(m_sParams.m_uiUdpRemoteIP);
         Send((const uint8_t*)acBuffer, 5+strlen(pText)+1, ipAddress, m_sParams.m_iUdpRemotePort);
     }
 }

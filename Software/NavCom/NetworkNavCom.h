@@ -20,17 +20,16 @@ public:
     virtual void GetNetworkParameters(types::NetworkParameters* pParam) override;
 
 protected:
+    //! Parses DREF message. Reimplement in inherited class.
+    virtual void ParseDREF(uint8_t* pBuffer);
 
-    //! Parses received UDP datagrams
-    //virtual void ParseUDP(AsyncUDPPacket &packet);
-
-    //! Parses COM1 & COM2 frequency
+    //! Parses COM1 & COM2 frequency DATA message.
     virtual void ParseCOM(uint8_t* pBuffer);
 
-    //! Parses NAV1 & NAV2 frequency
+    //! Parses NAV1 & NAV2 frequency DATA message.
     virtual void ParseNAV(uint8_t* pBuffer);
 
-    //! Parses NAV1 & NAV2 OBS
+    //! Parses NAV1 & NAV2 OBS DATA message.
     virtual void ParseOBS(uint8_t* pBuffer);
 
     /**

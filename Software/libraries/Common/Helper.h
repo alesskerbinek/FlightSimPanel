@@ -156,6 +156,20 @@ inline uint32_t IPtoInt(const char* pSource)
     }
 }
 
+// ---------------------------------------------------------------------
+
+/**
+* Function returning IPAddress from given 4 byte integer value.
+* The MSB is the first quadrant of IP address and LSB the last.
+* @param Integer value.
+* @return IPAdress object.
+*/
+inline IPAddress GetIPAddress(uint32_t uiValue)
+{
+    return IPAddress((uiValue >> 24) & 0xFF, (uiValue >> 16) & 0xFF,
+                    (uiValue >> 8) & 0xFF, uiValue & 0xFF);
+}
+
 // --------------------------------------------------------------------
 
 /**

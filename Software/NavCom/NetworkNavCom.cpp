@@ -31,6 +31,22 @@ void NetworkNavCom::GetNetworkParameters(types::NetworkParameters* pParam)
 
 // ----------------------------------------------------------------------------
 
+void NetworkNavCom::ParseDREF(uint8_t* pBuffer)
+{
+    if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drCom1ActiveFreq), 51) == 0) { // TODO size??????
+        float fValue = 0.0f;
+        memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+        m_pModel->SetActiveValue(fValue);
+    }
+    else if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drCom1StandbyFreq), 59) == 0) { // TODO size??????
+        float fValue = 0.0f;
+        memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+        m_pModel->SetStandbyValue(fValue);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
 void NetworkNavCom::ParseCOM(uint8_t* pBuffer)
 {
     float fValue = 0.0f;
@@ -52,10 +68,10 @@ void NetworkNavCom::ParseNAV(uint8_t* pBuffer)
     float fValue = 0.0f;
     memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));
     //Serial.printf("Nav1 act %i\n", int(fValue*10));
-    m_pModel->SetActiveValue(fValue*10);
+//    m_pModel->SetActiveValue(fValue*10);
     memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));
     //Serial.printf("Nav1 stb %i\n", int(fValue*10));
-    m_pModel->SetStandbyValue(fValue*10);
+//    m_pModel->SetStandbyValue(fValue*10);
 
     memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));
     //Serial.printf("Nav2 act %i\n", int(fValue*10));
