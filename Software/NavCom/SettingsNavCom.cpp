@@ -28,6 +28,12 @@ void SettingsNavCom::Initialize()
     // Only settings that can be reset by user - factory reset
     m_uiActiveValue = 0;
     m_uiStandbyValue = 0;
+
+    m_uiUdpListenPort = 0;
+    m_uiUdpRemotePort = 0;
+    m_uiUdpRemoteIP = 0;
+    memset(m_acWiFiSSID, 0, sizeof(m_acWiFiSSID));
+    memset(m_acWiFiPass, 0, sizeof(m_acWiFiPass));
 }
 
 // -------------------------------------------------------------------------
@@ -45,6 +51,8 @@ void SettingsNavCom::Save()
     strncpy(rSettings.acWiFiSSID, m_acWiFiSSID, sizeof(rSettings.acWiFiSSID));
     strncpy(rSettings.acWiFiPass, m_acWiFiPass, sizeof(rSettings.acWiFiPass));
     // IMPORTANT!!! When new setting is added, it has to be added here too
+    // IMPORTANT!!! And don't forfet to add it to Initialize() function if you
+    //              want it to be initialized with factory reset
 
     // Clear the rest of settings - we assure initialization this way
     memset(rSettings.auiFree, 0, sizeof(rSettings.auiFree));
