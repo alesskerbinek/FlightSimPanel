@@ -25,9 +25,6 @@ public:
     int16_t GetRotary(uint8_t uiId);
 
 private:
-    //! Main state machine for VOR unit
-    void ProcessVOR();
-
     //! Check rotary encoders states
     void CheckRotaries();
 
@@ -37,8 +34,32 @@ private:
     //! Handles rotary encoder change
     void HandleRotaryScroll(int8_t iId, int8_t iDir);
 
+    //! Handles rotary encoder change for Radio unit
+    void HandleRotaryScrollCOM(int8_t iId, int8_t iDir);
+
+    //! Handles rotary encoder change for Nav unit
+    void HandleRotaryScrollVOR(int8_t iId, int8_t iDir);
+
+    //! Handles rotary encoder change for ADF unit
+    void HandleRotaryScrollADF(int8_t iId, int8_t iDir);
+
+    //! Handles rotary encoder change for Transponder
+    void HandleRotaryScrollXPNDR(int8_t iId, int8_t iDir);
+
     //! Handles button press
     void HandleButtonRelease(int8_t iId);
+
+    //! Handles button press for Radio unit
+    void HandleButtonReleaseCOM(int8_t iId);
+
+    //! Handles button press for Nav unit
+    void HandleButtonReleaseVOR(int8_t iId);
+
+    //! Handles button press for ADF unit
+    void HandleButtonReleaseADF(int8_t iId);
+
+    //! Handles button press for Transponder
+    void HandleButtonReleaseXPNDR(int8_t iId);
 
 private:
     //! Model pointer;
@@ -60,7 +81,7 @@ private:
     uint8_t m_uiUsedButtons = BUTTON_COUNT;
 
     //! Flag indicating whether we are in MHz or kHz editing mode.
-    bool m_bIsMHz = false;
+    uint16_t m_uiDigitSelect = 0;
 };
 
 #endif // INPUT_H

@@ -28,22 +28,6 @@ void Input::Initialize()
 
 void Input::Process()
 {
-    // TODO check rotaries, buttons and switches
-
-//    switch (m_pModel->GetUnitType()) {
-//    case utCOM:     ProcessCOM();   break;
-//    case utVOR:
-    ProcessVOR();   //break;
-//    case utADF:     ProcessADF();   break;
-//    case utXPNDR:   ProcessXPNDR(); break;
-//    default: break;
-//    }
-}
-
-// -------------------------------------------------------------------------
-
-void Input::ProcessVOR()
-{
     CheckRotaries();
     CheckButtons();
 }
@@ -59,6 +43,8 @@ void Input::CheckButtons()
             if(digitalRead(m_auiButtonAddresses[ui]) == false) {
                 m_auiButtonValues[ui]++;
             } else {
+                // TODO if(m_auiButtonValues[ui] > 500) {
+                //          HandleButtonReleaseLong(ui);
                 if(m_auiButtonValues[ui] > 50) {
                     HandleButtonRelease(ui);
                 }
@@ -66,8 +52,6 @@ void Input::CheckButtons()
             }
         }
     }
-
-    //Serial.printf("Analog: %03i, %03i\n", analogRead(ROT2_A), analogRead(ROT2_B));
 }
 
 // -------------------------------------------------------------------------
@@ -110,19 +94,22 @@ void Input::CheckRotaries()
 
 void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
 {
-    // TODO switch unit type
-
-    if(iId == 0) {
-        if(m_pModel) {
-            if(m_bIsMHz) {
-                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown));
-                //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown));
-                //m_pModel->IncrStandbyValue(iDir*1000);
-            } else {
-                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down));
-                //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown));
-                //m_pModel->IncrStandbyValue(iDir*5);
-            }
+    if(m_pModel) {
+        switch (m_pModel->GetUnitType()) {
+        case utCom:
+            HandleRotaryScrollCOM(iId, iDir);
+            break;
+        case utVOR:
+            HandleRotaryScrollVOR(iId, iDir);
+            break;
+        case utADF:
+            HandleRotaryScrollADF(iId, iDir);
+            break;
+        case utXPNDR:
+            HandleRotaryScrollXPNDR(iId, iDir);
+            break;
+        default:
+            break;
         }
     }
 }
@@ -131,8 +118,102 @@ void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
 
 void Input::HandleButtonRelease(int8_t iId)
 {
-    // TODO switch unit type
+    if(m_pModel) {
+        switch (m_pModel->GetUnitType()) {
+        case utCom:
+            HandleButtonReleaseCOM(iId);
+            break;
+        case utVOR:
+            HandleButtonReleaseVOR(iId);
+            break;
+        case utADF:
+            HandleButtonReleaseADF(iId);
+            break;
+        case utXPNDR:
+            HandleButtonReleaseXPNDR(iId);
+            break;
+        default:
+            break;
+        }
+    }
+}
 
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScrollCOM(int8_t iId, int8_t iDir)
+{
+    if(m_pModel && iId == 0) // Right rotary
+    {
+        if(m_uiDigitSelect == 1) {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown));
+        } else {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down));
+        }
+    }
+    else if (m_pModel && iId == 1) // Left rotary
+    {
+        // TODO Volume
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScrollVOR(int8_t iId, int8_t iDir)
+{
+    if(m_pModel && iId == 0) // Right rotary
+    {
+        if(m_uiDigitSelect == 1) {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown));
+            //m_pModel->IncrStandbyValue(iDir*1000);
+        } else {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown));
+            //m_pModel->IncrStandbyValue(iDir*5);
+        }
+    }
+    else if (m_pModel && iId == 1) // Left rotary
+    {
+        // TODO OBS
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScrollADF(int8_t iId, int8_t iDir)
+{
+    if(m_pModel)
+    {
+        if(m_uiDigitSelect == 0) {
+            // TODO change XX00
+        } else if(m_uiDigitSelect == 1) {
+            // TODO change 00X0
+        } else {
+            // TODO change 000X
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScrollXPNDR(int8_t iId, int8_t iDir)
+{
+    if(m_pModel)
+    {
+        if(m_uiDigitSelect == 0) {
+            // TODO change X000
+        } else if(m_uiDigitSelect == 1) {
+            // TODO change 0X00
+        } else if(m_uiDigitSelect == 2) {
+            // TODO change 00X0
+        } else {
+            // TODO change 000X
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleButtonReleaseCOM(int8_t iId)
+{
     /*
     AddToTxQueue(UdpDatagram(UdpDataType::dtDREF, DataRefs::drCom1Freq, (uint32_t)0x462AA001));
     AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
@@ -141,36 +222,107 @@ void Input::HandleButtonRelease(int8_t iId)
 
     switch (iId) {
     case 0:
-        m_bIsMHz = !m_bIsMHz;
+        m_uiDigitSelect = (m_uiDigitSelect+1)%2;
         break;
     case 1:
-        break;
-    case 2:
-        if(m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCHAR, 0, (uint32_t)0x70));
-        }
+        // TODO On/Off ???
         break;
     case 3:
         if(m_pModel) {
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Flip));
-            //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1Flip));
-            //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmFlapsUp));
-
-            //uint32_t uiTmp = m_pModel->GetActiveValue();
-            //m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
-            //m_pModel->SetStandbyValue(uiTmp);
-            //m_pModel->SaveSettings();
-            m_bIsMHz = false;
+            m_uiDigitSelect = 0;
         }
         break;
     case 4:
+        // TODO Emergency
+        break;
+    default:
+        break;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleButtonReleaseVOR(int8_t iId)
+{
+    switch (iId) {
+    case 0:
+        m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+        break;
+    case 1:
+        // TODO Show OBS
+        break;
+    case 3:
         if(m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCHAR, 0, (uint32_t)0x50));
+//            if(m_pModel->IsDemoMode()) {
+//                uint32_t uiTmp = m_pModel->GetActiveValue();
+//                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+//                m_pModel->SetStandbyValue(uiTmp);
+//                m_pModel->SaveSettings();
+//            } else {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1Flip));
+                m_uiDigitSelect = 0;
+//            }
         }
         break;
+    default:
+        break;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleButtonReleaseADF(int8_t iId)
+{
+    switch (iId) {
+    case 0:
+        m_uiDigitSelect = (m_uiDigitSelect+1)%3;
+        break;
+    case 2:
+        // TODO SET/RST
+        break;
+    case 3:
+        // TODO FT/ET
+        break;
+    case 4:
+        // TODO <->/FREQ
+        break;
     case 5:
+        // TODO BFO ???
         break;
     case 6:
+        // TODO ADF
+        break;
+    default:
+        break;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleButtonReleaseXPNDR(int8_t iId)
+{
+    switch (iId) {
+    case 0:
+        m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+        break;
+    case 2:
+        // TODO ALT
+        break;
+    case 3:
+        // TODO ON
+        break;
+    case 4:
+        // TODO SBY
+        break;
+    case 5:
+        // TODO OFF
+        break;
+    case 6:
+        // TODO VFR
+        break;
+    case 7:
+        // TODO IDT
         break;
     default:
         break;

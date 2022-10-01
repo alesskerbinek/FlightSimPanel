@@ -32,13 +32,10 @@ private:
     void SetSegments(int8_t iSegments, bool bDecimalPoint = false);
 
     //! Sets active value
-    void SetActive(uint32_t uiVal);
+    void SetActive(uint32_t uiVal, bool b833);
 
     //! Sets standby value
-    void SetStandby(uint32_t uiVal);
-
-    //! Main state machine for VOR unit
-    void ProcessVOR();
+    void SetStandby(uint32_t uiVal, bool b833);
 
 private:
     //! Model pointer;

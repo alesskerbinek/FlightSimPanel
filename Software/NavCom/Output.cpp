@@ -20,22 +20,7 @@ void Output::Initialize()
 
 void Output::Process()
 {
-    // TODO Handle 7 segment displays and LEDs
-
-//    switch (m_pModel->GetUnitType()) {
-//    case utCOM:     ProcessCOM();   break;
-//    case utVOR:
-        ProcessVOR();   //break;
-//    case utADF:     ProcessADF();   break;
-//    case utXPNDR:   ProcessXPNDR(); break;
-//    default: break;
-//    }
-}
-
-// -------------------------------------------------------------------------
-
-void Output::ProcessVOR()
-{
+    // Handle 7 segment displays and LEDs
     bool bDP = m_iDigit == 2 || m_iDigit == 8;
 
     //Select the digit and set value on the bus
@@ -76,17 +61,36 @@ void Output::SetSegments(int8_t iSegments, bool bDecimalPoint)
 void Output::UpdateValues()
 {
     if(m_pModel) {
-        SetActive(m_pModel->GetActiveValue());
-        SetStandby(m_pModel->GetStandbyValue());
+        switch (m_pModel->GetUnitType()) {
+        case utCom:
+            SetActive(m_pModel->GetActiveValue(), true);
+            SetStandby(m_pModel->GetStandbyValue(), true);
+            break;
+        case utVOR:
+            SetActive(m_pModel->GetActiveValue(), false);
+            SetStandby(m_pModel->GetStandbyValue(), false);
+            break;
+        case utADF:
+            // TODO SetActiveADF
+            // TODO SetStandbyADF or SetTimeADF
+            break;
+        case utXPNDR:
+            // TODO SetSquawk
+            // TODO SetMode
+            break;
+        default:
+            break;
+        }
     }
 }
 
 // -------------------------------------------------------------------------
 
-void Output::SetActive(uint32_t uiVal)
-{
+void Output::SetActive(uint32_t uiVal, bool b833)
+{    
     if(DIGIT_COUNT >= 6)
     {
+        // TODO if(833)
         m_auiDigitValues[5] = m_auiChars[uiVal % 10];
         m_auiDigitValues[4] = m_auiChars[uiVal/10 % 10];
         m_auiDigitValues[3] = m_auiChars[uiVal/100 % 10];
@@ -98,10 +102,11 @@ void Output::SetActive(uint32_t uiVal)
 
 // -------------------------------------------------------------------------
 
-void Output::SetStandby(uint32_t uiVal)
+void Output::SetStandby(uint32_t uiVal, bool b833)
 {
     if(DIGIT_COUNT >= 12)
     {
+        // TODO if(833)
         m_auiDigitValues[11] = m_auiChars[uiVal % 10];
         m_auiDigitValues[10] = m_auiChars[uiVal/10 % 10];
         m_auiDigitValues[9]  = m_auiChars[uiVal/100 % 10];
