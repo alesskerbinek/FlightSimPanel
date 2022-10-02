@@ -34,6 +34,7 @@ void SettingsNavCom::Initialize()
     m_uiUdpRemoteIP = 0;
     memset(m_acWiFiSSID, 0, sizeof(m_acWiFiSSID));
     memset(m_acWiFiPass, 0, sizeof(m_acWiFiPass));
+    m_uiOBS = 0;
 }
 
 // -------------------------------------------------------------------------
@@ -50,6 +51,7 @@ void SettingsNavCom::Save()
     rSettings.uiUdpRemoteIP     = m_uiUdpRemoteIP;
     strncpy(rSettings.acWiFiSSID, m_acWiFiSSID, sizeof(rSettings.acWiFiSSID));
     strncpy(rSettings.acWiFiPass, m_acWiFiPass, sizeof(rSettings.acWiFiPass));
+    rSettings.uiOBS             = m_uiOBS;
     // IMPORTANT!!! When new setting is added, it has to be added here too
     // IMPORTANT!!! And don't forfet to add it to Initialize() function if you
     //              want it to be initialized with factory reset
@@ -95,6 +97,7 @@ void SettingsNavCom::CopyToVariables(settings_t *pSettings)
     m_uiUdpRemoteIP     = pSettings->uiUdpRemoteIP;
     strncpy(m_acWiFiSSID, pSettings->acWiFiSSID, sizeof(m_acWiFiSSID));
     strncpy(m_acWiFiPass, pSettings->acWiFiPass, sizeof(m_acWiFiPass));
+    m_uiOBS             = pSettings->uiOBS;
     // IMPORTANT!!! When new setting is added, it has to be added here too
 }
 

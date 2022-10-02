@@ -45,6 +45,14 @@ public:
         void SetStandbyValue(uint32_t uiValue)
         {   m_uiStandbyValue = uiValue; }
 
+        //! Returns current OBS value on display
+        uint16_t GetOBS() const
+        {   return m_uiOBS; }
+
+        //! Sets current OBS value on display
+        void SetOBS(uint16_t uiValue)
+        {   m_uiOBS = uiValue; }
+
         //! Returns this unit type
         UnitTypes GetUnitType()
         {   return m_eUnitType; }
@@ -66,6 +74,9 @@ protected:
 
         //! Last standby frequency or squawk
         uint32_t m_uiStandbyValue = 0;
+
+        //! Last OBS value
+        uint16_t m_uiOBS = 0;
 
         //! This unit type
         UnitTypes m_eUnitType = utUndefined;
