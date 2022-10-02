@@ -116,15 +116,19 @@ typedef  struct {
     uint16_t uiUdpListenPort;   // 2 bytes
     uint16_t uiUdpRemotePort;   // 2 bytes
     uint32_t uiUdpRemoteIP;     // 4 bytes
-    uint8_t  auiFree[168];      // FREE SPACE (sum of structure = 256 bytes)
+    uint16_t uiOBS;             // 2 bytes
+    uint8_t  auiFree[166];      // FREE SPACE (sum of structure = 256 bytes)
 } settings_t;
 
 //! Unit types
 typedef  enum {
     utUndefined = 0,
-    utCom,
-    utVOR,
-    utADF,
+    utCom1,
+    utCom2,
+    utVOR1,
+    utVOR2,
+    utADF1,
+    utADF2,
     utXPNDR
 } UnitTypes;
 

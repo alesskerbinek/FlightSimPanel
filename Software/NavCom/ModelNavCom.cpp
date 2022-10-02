@@ -32,15 +32,18 @@ void ModelNavCom::Initialize()
             m_uiMinActive = 94000;
             m_uiMaxActive = 108000;
             break;
-        case utCom:
+        case utCom1:
+        case utCom2:
             m_uiMinActive = 118000;
             m_uiMaxActive = 136000;
             break;
-        case utVOR:
+        case utVOR1:
+        case utVOR2:
             m_uiMinActive = 108000;
             m_uiMaxActive = 118000;
             break;
-        case utADF:
+        case utADF1:
+        case utADF2:
             m_uiMinActive = 190;
             m_uiMaxActive = 1750;
             break;

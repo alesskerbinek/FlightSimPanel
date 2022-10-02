@@ -134,6 +134,12 @@ const char* Network::GetDataRefString(xplane::DataRefs dr)
         return "sim/cockpit2/radios/actuators/com1_frequency_hz_833";           // OK
     case xplane::drCom1StandbyFreq:
         return "sim/cockpit2/radios/actuators/com1_standby_frequency_hz_833";   // OK
+    case xplane::drCom2ActiveFreq:
+        return "sim/cockpit2/radios/actuators/com2_frequency_hz_833";           // OK
+    case xplane::drCom2StandbyFreq:
+        return "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833";   // OK
+    case xplane::drCom1Power:
+        return "sim/cockpit2/radios/actuators/com1_power";
     default:
         return nullptr;
     }
@@ -147,13 +153,13 @@ const char* Network::GetCommandString(xplane::Commands cmd)
     case xplane::cmNav1Flip:
         return "sim/radios/nav1_standy_flip";           // OK
     case xplane::cmNav2Flip:
-        return "sim/radios/nav2_standy_flip";
+        return "sim/radios/nav2_standy_flip";           // OK
     case xplane::cmCom1Flip:
         return "sim/radios/com1_standy_flip";           // OK
     case xplane::cmCom2Flip:
-        return "sim/radios/com2_standy_flip";
+        return "sim/radios/com2_standy_flip";           // OK
     case xplane::cmAdf1Flip:
-        return "sim/radios/adf1_standy_flip";
+        return "sim/radios/adf1_standy_flip";           // OK
     case xplane::cmAdf2Flip:
         return "sim/radios/adf2_standy_flip";
     case xplane::cmDmeFlip:
@@ -166,10 +172,18 @@ const char* Network::GetCommandString(xplane::Commands cmd)
         return "sim/radios/stby_nav1_fine_up";          // OK
     case xplane::cmNav1StandbyFineDown:
         return "sim/radios/stby_nav1_fine_down";        // OK
+    case xplane::cmNav2StandbyCoarseUp:
+        return "sim/radios/stby_nav2_coarse_up";        // OK
+    case xplane::cmNav2StandbyCoarseDown:
+        return "sim/radios/stby_nav2_coarse_down";      // OK
+    case xplane::cmNav2StandbyFineUp:
+        return "sim/radios/stby_nav2_fine_up";          // OK
+    case xplane::cmNav2StandbyFineDown:
+        return "sim/radios/stby_nav2_fine_down";        // OK
     case xplane::cmCom1StandbyCoarseUp:
-        return "sim/radios/stby_com1_coarse_up";
+        return "sim/radios/stby_com1_coarse_up";        // OK
     case xplane::cmCom1StandbyCoarseDown:
-        return "sim/radios/stby_com1_coarse_down";
+        return "sim/radios/stby_com1_coarse_down";      // OK
     case xplane::cmCom1StandbyFineUp:
         return "sim/radios/stby_com1_fine_up";          // OK
     case xplane::cmCom1StandbyFineDown:
@@ -178,12 +192,40 @@ const char* Network::GetCommandString(xplane::Commands cmd)
         return "sim/radios/stby_com1_fine_up_833";      // OK
     case xplane::cmCom1Standby833Down:
         return "sim/radios/stby_com1_fine_down_833";    // OK
+    case xplane::cmCom2StandbyCoarseUp:
+        return "sim/radios/stby_com2_coarse_up";        // OK
+    case xplane::cmCom2StandbyCoarseDown:
+        return "sim/radios/stby_com2_coarse_down";      // OK
+    case xplane::cmCom2StandbyFineUp:
+        return "sim/radios/stby_com2_fine_up";          // OK
+    case xplane::cmCom2StandbyFineDown:
+        return "sim/radios/stby_com2_fine_down";        // OK
+    case xplane::cmCom2Standby833Up:
+        return "sim/radios/stby_com2_fine_up_833";      // OK
+    case xplane::cmCom2Standby833Down:
+        return "sim/radios/stby_com2_fine_down_833";    // OK
+    case xplane::cmCom1On:
+        return "sim/radios/power_com1_on";              // X
+    case xplane::cmCom1Off:
+        return "sim/radios/power_com1_off";             // X
+    case xplane::cmCom2On:
+        return "sim/radios/power_com2_on";              // X
+    case xplane::cmCom2Off:
+        return "sim/radios/power_com2_off";             // X
+    case xplane::cmNav1ObsUp:
+        return "sim/radios/obs1_up";
+    case xplane::cmNav1ObsDown:
+        return "sim/radios/obs1_down";
+    case xplane::cmNav2ObsUp:
+        return "sim/radios/obs2_up";
+    case xplane::cmNav2ObsDown:
+        return "sim/radios/obs2_down";
     case xplane::cmLandingGear:
         return "sim/flight_controls/landing_gear_down";
     case xplane::cmFlapsUp:
         return "sim/flight_controls/flaps_up";          // OK
     case xplane::cmFlapsDown:
-        return "sim/flight_controls/flaps_down";
+        return "sim/flight_controls/flaps_down";        // OK
     default:
         return nullptr;
     }

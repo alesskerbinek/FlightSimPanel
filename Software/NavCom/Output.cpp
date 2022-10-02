@@ -62,15 +62,18 @@ void Output::UpdateValues()
 {
     if(m_pModel) {
         switch (m_pModel->GetUnitType()) {
-        case utCom:
+        case utCom1:
+        case utCom2:
             SetActive(m_pModel->GetActiveValue(), true);
             SetStandby(m_pModel->GetStandbyValue(), true);
             break;
-        case utVOR:
+        case utVOR1:
+        case utVOR2:
             SetActive(m_pModel->GetActiveValue(), false);
             SetStandby(m_pModel->GetStandbyValue(), false);
             break;
-        case utADF:
+        case utADF1:
+        case utADF2:
             // TODO SetActiveADF
             // TODO SetStandbyADF or SetTimeADF
             break;

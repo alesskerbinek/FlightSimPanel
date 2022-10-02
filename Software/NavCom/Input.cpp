@@ -92,21 +92,24 @@ void Input::CheckRotaries()
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
+void Input::HandleRotaryScroll(int8_t iRotaryId, int8_t iDirection)
 {
     if(m_pModel) {
         switch (m_pModel->GetUnitType()) {
-        case utCom:
-            HandleRotaryScrollCOM(iId, iDir);
-            break;
-        case utVOR:
-            HandleRotaryScrollVOR(iId, iDir);
-            break;
-        case utADF:
-            HandleRotaryScrollADF(iId, iDir);
-            break;
+        case utCom1:
+            HandleRotaryScrollCOM(iRotaryId, iDirection, 1); break;
+        case utCom2:
+            HandleRotaryScrollCOM(iRotaryId, iDirection, 2); break;
+        case utVOR1:
+            HandleRotaryScrollVOR(iRotaryId, iDirection, 1); break;
+        case utVOR2:
+            HandleRotaryScrollVOR(iRotaryId, iDirection, 2); break;
+        case utADF1:
+            HandleRotaryScrollADF(iRotaryId, iDirection, 1); break;
+        case utADF2:
+            HandleRotaryScrollADF(iRotaryId, iDirection, 2); break;
         case utXPNDR:
-            HandleRotaryScrollXPNDR(iId, iDir);
+            HandleRotaryScrollXPNDR(iRotaryId, iDirection);
             break;
         default:
             break;
@@ -116,22 +119,24 @@ void Input::HandleRotaryScroll(int8_t iId, int8_t iDir)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonRelease(int8_t iId)
+void Input::HandleButtonRelease(int8_t iButtonId)
 {
     if(m_pModel) {
         switch (m_pModel->GetUnitType()) {
-        case utCom:
-            HandleButtonReleaseCOM(iId);
-            break;
-        case utVOR:
-            HandleButtonReleaseVOR(iId);
-            break;
-        case utADF:
-            HandleButtonReleaseADF(iId);
-            break;
+        case utCom1:
+            HandleButtonReleaseCOM(iButtonId, 1); break;
+        case utCom2:
+            HandleButtonReleaseCOM(iButtonId, 2); break;
+        case utVOR1:
+            HandleButtonReleaseVOR(iButtonId, 1); break;
+        case utVOR2:
+            HandleButtonReleaseVOR(iButtonId, 2); break;
+        case utADF1:
+            HandleButtonReleaseADF(iButtonId, 1); break;
+        case utADF2:
+            HandleButtonReleaseADF(iButtonId, 2); break;
         case utXPNDR:
-            HandleButtonReleaseXPNDR(iId);
-            break;
+            HandleButtonReleaseXPNDR(iButtonId); break;
         default:
             break;
         }
@@ -140,17 +145,29 @@ void Input::HandleButtonRelease(int8_t iId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScrollCOM(int8_t iId, int8_t iDir)
+void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iComId)
 {
-    if(m_pModel && iId == 0) // Right rotary
+    if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
         if(m_uiDigitSelect == 1) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown));
+            xplane::Commands cmd;
+            if(iComId == 1) {
+                cmd = iDirection > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown;
+            } else {
+                cmd = iDirection > 0 ? xplane::Commands::cmCom2StandbyCoarseUp : xplane::Commands::cmCom2StandbyCoarseDown;
+            }
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down));
+            xplane::Commands cmd;
+            if(iComId == 1) {
+                cmd = iDirection > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down;
+            } else {
+                cmd = iDirection > 0 ? xplane::Commands::cmCom2Standby833Up : xplane::Commands::cmCom2Standby833Down;
+            }
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         }
     }
-    else if (m_pModel && iId == 1) // Left rotary
+    else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
     {
         // TODO Volume
     }
@@ -158,27 +175,45 @@ void Input::HandleRotaryScrollCOM(int8_t iId, int8_t iDir)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScrollVOR(int8_t iId, int8_t iDir)
+void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iVorId)
 {
-    if(m_pModel && iId == 0) // Right rotary
+    if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
         if(m_uiDigitSelect == 1) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown));
+            xplane::Commands cmd;
+            if(iVorId == 1) {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown;
+            } else {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav2StandbyCoarseDown;
+            }
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             //m_pModel->IncrStandbyValue(iDir*1000);
         } else {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, iDir > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown));
+            xplane::Commands cmd;
+            if(iVorId == 1) {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown;
+            } else {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav2StandbyFineDown;
+            }
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             //m_pModel->IncrStandbyValue(iDir*5);
         }
     }
-    else if (m_pModel && iId == 1) // Left rotary
+    else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
     {
-        // TODO OBS
+        xplane::Commands cmd;
+        if(iVorId == 1) {
+            cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
+        } else {
+            cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav2ObsDown;
+        }
+        m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
     }
 }
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScrollADF(int8_t iId, int8_t iDir)
+void Input::HandleRotaryScrollADF(int8_t iRotaryId, int8_t iDirection, int8_t iAdfId)
 {
     if(m_pModel)
     {
@@ -194,7 +229,7 @@ void Input::HandleRotaryScrollADF(int8_t iId, int8_t iDir)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScrollXPNDR(int8_t iId, int8_t iDir)
+void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
 {
     if(m_pModel)
     {
@@ -212,29 +247,37 @@ void Input::HandleRotaryScrollXPNDR(int8_t iId, int8_t iDir)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseCOM(int8_t iId)
+void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId)
 {
     /*
-    AddToTxQueue(UdpDatagram(UdpDataType::dtDREF, DataRefs::drCom1Freq, (uint32_t)0x462AA001));
     AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
-    AddToTxQueue(UdpDatagram(UdpDataType::dtCMND, Commands::cmLandingGear));
     */
 
-    switch (iId) {
+    switch (iButtonId) {
     case 0:
         m_uiDigitSelect = (m_uiDigitSelect+1)%2;
         break;
-    case 1:
-        // TODO On/Off ???
-        break;
-    case 3:
+    case 2: // On/Off
         if(m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Flip));
+            //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
+                        iComId == 1 ? xplane::DataRefs::drCom1Power : xplane::DataRefs::drCom1Power,
+                        (uint32_t)0)); // == Off
+        }
+        break;
+    case 3: // Flip
+        if(m_pModel) {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                        iComId == 1 ? xplane::Commands::cmCom1Flip : xplane::Commands::cmCom2Flip));
             m_uiDigitSelect = 0;
         }
         break;
-    case 4:
-        // TODO Emergency
+    case 4: // Set Emergency frequency
+        if(m_pModel) {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
+                        iComId == 1 ? xplane::DataRefs::drCom1ActiveFreq : xplane::DataRefs::drCom2ActiveFreq,
+                        (uint32_t)0x47ed4e00)); // == 121.500
+        }
         break;
     default:
         break;
@@ -243,9 +286,9 @@ void Input::HandleButtonReleaseCOM(int8_t iId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseVOR(int8_t iId)
+void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId)
 {
-    switch (iId) {
+    switch (iButtonId) {
     case 0:
         m_uiDigitSelect = (m_uiDigitSelect+1)%2;
         break;
@@ -260,7 +303,8 @@ void Input::HandleButtonReleaseVOR(int8_t iId)
 //                m_pModel->SetStandbyValue(uiTmp);
 //                m_pModel->SaveSettings();
 //            } else {
-                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmNav1Flip));
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iVorId == 1 ? xplane::Commands::cmNav1Flip : xplane::Commands::cmNav2Flip));
                 m_uiDigitSelect = 0;
 //            }
         }
@@ -272,9 +316,9 @@ void Input::HandleButtonReleaseVOR(int8_t iId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseADF(int8_t iId)
+void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId)
 {
-    switch (iId) {
+    switch (iButtonId) {
     case 0:
         m_uiDigitSelect = (m_uiDigitSelect+1)%3;
         break;
@@ -286,6 +330,11 @@ void Input::HandleButtonReleaseADF(int8_t iId)
         break;
     case 4:
         // TODO <->/FREQ
+        if(m_pModel) {
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                        iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
+            m_uiDigitSelect = 0;
+        }
         break;
     case 5:
         // TODO BFO ???
@@ -300,9 +349,9 @@ void Input::HandleButtonReleaseADF(int8_t iId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseXPNDR(int8_t iId)
+void Input::HandleButtonReleaseXPNDR(int8_t iButtonId)
 {
-    switch (iId) {
+    switch (iButtonId) {
     case 0:
         m_uiDigitSelect = (m_uiDigitSelect+1)%4;
         break;
