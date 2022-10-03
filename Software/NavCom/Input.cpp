@@ -28,8 +28,29 @@ void Input::Initialize()
 
 void Input::Process()
 {
-    CheckRotaries();
-    CheckButtons();
+    if(m_pModel) {
+        switch (m_pModel->GetUnitType()) {
+        case utCom1:
+        case utCom2:
+        case utVOR1:
+        case utVOR2:
+            CheckRotaries();
+            CheckButtons();
+            break;
+        case utADF1:
+        case utADF2:
+            CheckRotaries(); // TODO only one
+            CheckButtons();
+            // TODO CheckSwitches();
+            break;
+        case utXPNDR:
+            CheckRotaries(); // TODO only one
+            CheckButtons();
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 // -------------------------------------------------------------------------
@@ -235,12 +256,16 @@ void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
     {
         if(m_uiDigitSelect == 0) {
             // TODO change X000
+            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*1000);
         } else if(m_uiDigitSelect == 1) {
             // TODO change 0X00
+            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*100);
         } else if(m_uiDigitSelect == 2) {
             // TODO change 00X0
+            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*10);
         } else {
             // TODO change 000X
+            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection);
         }
     }
 }
@@ -352,26 +377,26 @@ void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId)
 void Input::HandleButtonReleaseXPNDR(int8_t iButtonId)
 {
     switch (iButtonId) {
-    case 0:
+    case 0: // Go to next digit
         m_uiDigitSelect = (m_uiDigitSelect+1)%4;
         break;
-    case 2:
-        // TODO ALT
+    case 1: // Ident
+        m_pModel->SetStandbyValue(4);
         break;
-    case 3:
-        // TODO ON
+    case 2: // ALT
+        m_pModel->SetStandbyValue(3);
         break;
-    case 4:
-        // TODO SBY
+    case 3:// ON
+        m_pModel->SetStandbyValue(2);
         break;
-    case 5:
-        // TODO OFF
+    case 4: // SBY
+        m_pModel->SetStandbyValue(1);
         break;
-    case 6:
-        // TODO VFR
+    case 5: // OFF
+        m_pModel->SetStandbyValue(0);
         break;
-    case 7:
-        // TODO IDT
+    case 6: // VFR (Set squawk 2000)
+        m_pModel->SetActiveValue(2000);
         break;
     default:
         break;

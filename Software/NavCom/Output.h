@@ -19,6 +19,7 @@ public:
     void Initialize();
 
     //! Main state machine loop.
+    //! Handle 7 segment displays and LEDs.
     void Process();
 
     //! Updates values on display from model.
@@ -29,13 +30,25 @@ private:
     void SelectDigit(int8_t iDigit);
 
     //! Sets value to currently selected digit.
-    void SetSegments(int8_t iSegments, bool bDecimalPoint = false);
+    void SetSegments(int8_t iSegments);
 
-    //! Sets active value
-    void SetActive(uint32_t uiVal, bool b833);
+    //! Sets active VHF frequency
+    void SetActiveMHz(uint32_t uiVal, bool b833);
 
-    //! Sets standby value
-    void SetStandby(uint32_t uiVal, bool b833);
+    //! Sets standby VHF frequency
+    void SetStandbyMHz(uint32_t uiVal, bool b833);
+
+    //! Sets active MF/HF frequency
+    void SetActiveKHz(uint32_t uiVal);
+
+    //! Sets standby MF/HF frequency
+    void SetStandbyKHz(uint32_t uiVal);
+
+    //! Sets transponder squawk
+    void SetSquawk(uint32_t uiVal);
+
+    //! Sets transponder mode
+    void SetMode(uint32_t uiVal);
 
 private:
     //! Model pointer;
