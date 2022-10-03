@@ -98,9 +98,18 @@
 #define CH_D 0xA1
 #define CH_E 0x86
 #define CH_F 0x8E
+#define CH_G 0x82
+#define CH_I 0xF9
 #define CH_L 0xC7
+#define CH_N 0xAB
+#define CH_O 0xC0
+#define CH_S 0x92
+#define CH_T 0x87
+#define CH_Y 0x91
 #define CH_Z 0xA4
 #define CH_SPACE 0xFF
+
+#define DECIMAL_POINT   0x7F
 
 // --------------------------------------------------------------------------
 
