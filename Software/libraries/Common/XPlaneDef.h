@@ -23,9 +23,23 @@ enum UdpDataType {
  * @brief The DATA message ids that are being parsed
  */
 enum DataId {
-    idComFreq = 96,
-    idNavFreq,
+    idComFreq = 96,                 // 25kHz only
+    idNavFreq,                      // OK
     idNavObs,
+    idAdfStatus = 101,
+    idDmeStatus,
+    idXpndrStatus = 104,
+    idMarkerStatus,
+    idElectricalSwitches,
+    idAutopilotStatus = 108,
+    idGeneralAnnunicators1 = 113,
+    idGeneralAnnunicators2,
+    idEngineAnnunicators,
+    idAutopilotArmedStatus,
+    idAutopilotModes,
+    idAutopilotValues,
+    idElectircalAndSolar = 124,
+    idHardwareOptions = 129,
 };
 
 // --------------------------------------------------------------------
