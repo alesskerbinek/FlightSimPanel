@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Helper.h>
 #include "ApplicationDefines.h"
 #include "Output.h"
 
@@ -57,7 +58,12 @@ void Output::SetSegments(int8_t iSegments)
 
 void Output::UpdateValues()
 {
-    if(m_pModel) {
+    if(m_pModel)
+    {
+        // Set Connection status LED. We turn LED on with LOW.
+        digitalWrite(PIN_CONN, m_pModel->IsSimConnected() ? LOW : HIGH);
+
+        // Unit specific output
         switch (m_pModel->GetUnitType()) {
         case utCom1:
         case utCom2:
@@ -78,8 +84,11 @@ void Output::UpdateValues()
             break;
         case utXPNDR:
             SetSquawk(m_pModel->GetActiveValue());
-            SetMode(m_pModel->GetStandbyValue());
-            // TODO SetMode(m_pModel->GetXpndrMode());
+            if(m_pModel->IsXpndrIdent()) {
+                SetIdent();
+            } else {
+                SetMode(m_pModel->GetXpndrMode());
+            }
             break;
         default:
             break;
@@ -160,34 +169,29 @@ void Output::SetSquawk(uint32_t uiVal)
 
 // -------------------------------------------------------------------------
 
-void Output::SetMode(uint32_t uiVal)
+void Output::SetMode(XpndrModes eMode)
 {
     if(DIGIT_COUNT >= 3)
     {
-        switch (uiVal) {
-        case 0:
+        switch (eMode) {
+        case xmOff:
             m_auiDigitValues[0] = CH_O;
             m_auiDigitValues[1] = CH_F;
             m_auiDigitValues[2] = CH_F;
             break;
-        case 1:
+        case xmSby:
             m_auiDigitValues[0] = CH_S;
             m_auiDigitValues[1] = CH_B;
             m_auiDigitValues[2] = CH_Y;
             break;
-        case 2:
+        case xmOn:
             m_auiDigitValues[0] = CH_O;
             m_auiDigitValues[1] = CH_N;
             m_auiDigitValues[2] = CH_SPACE;
             break;
-        case 3:
+        case xmAlt:
             m_auiDigitValues[0] = CH_A;
             m_auiDigitValues[1] = CH_L;
-            m_auiDigitValues[2] = CH_T;
-            break;
-        case 4:
-            m_auiDigitValues[0] = CH_I;
-            m_auiDigitValues[1] = CH_D;
             m_auiDigitValues[2] = CH_T;
             break;
         default:
@@ -197,3 +201,20 @@ void Output::SetMode(uint32_t uiVal)
 }
 
 // -------------------------------------------------------------------------
+
+void Output::SetIdent()
+{
+    if(DIGIT_COUNT >= 3)
+    {
+        // Blink 1Hz with 50% duty cycle
+        if(helper::GetTime() % 1000 < 500) {
+            m_auiDigitValues[0] = CH_I;
+            m_auiDigitValues[1] = CH_D;
+            m_auiDigitValues[2] = CH_T;
+        } else {
+            m_auiDigitValues[0] = CH_SPACE;
+            m_auiDigitValues[1] = CH_SPACE;
+            m_auiDigitValues[2] = CH_SPACE;
+        }
+    }
+}

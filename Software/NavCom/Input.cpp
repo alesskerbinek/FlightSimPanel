@@ -34,17 +34,17 @@ void Input::Process()
         case utCom2:
         case utVOR1:
         case utVOR2:
-            CheckRotaries();
+            CheckRotaries(true, true);
             CheckButtons();
             break;
         case utADF1:
         case utADF2:
-            CheckRotaries(); // TODO only one
+            CheckRotaries(false, true);
             CheckButtons();
             // TODO CheckSwitches();
             break;
         case utXPNDR:
-            CheckRotaries(); // TODO only one
+            CheckRotaries(false, true);
             CheckButtons();
             break;
         default:
@@ -59,15 +59,21 @@ void Input::CheckButtons()
 {
     if(m_uiUsedButtons <= BUTTON_COUNT)
     {
+        // Loop through all buttons
         for(uint8_t ui = 0; ui<m_uiUsedButtons; ui++)
         {
+            // On press count up how long it is pressed
             if(digitalRead(m_auiButtonAddresses[ui]) == false) {
                 m_auiButtonValues[ui]++;
+                // Check for long-press
+                if(m_auiButtonValues[ui] > 1000) {
+                    HandleButtonRelease(ui, true);
+                    m_auiButtonValues[ui] = 0;
+                }
             } else {
-                // TODO if(m_auiButtonValues[ui] > 500) {
-                //          HandleButtonReleaseLong(ui);
+                // On release check if it was pressed long enough to make action
                 if(m_auiButtonValues[ui] > 50) {
-                    HandleButtonRelease(ui);
+                    HandleButtonRelease(ui, false);
                 }
                 m_auiButtonValues[ui] = 0;
             }
@@ -77,37 +83,41 @@ void Input::CheckButtons()
 
 // -------------------------------------------------------------------------
 
-void Input::CheckRotaries()
+void Input::CheckRotaries(bool bLeft, bool bRight)
 {
     if(ROTARY_COUNT >= 2)
     {
         // In case rotary becomes erratic - jumping, try to increase minimum time difference since last change
 
-        bool bB1 = digitalRead(ROT1_B);
-        if(bB1 != m_abLastState[0] && bB1 == 1 && helper::GetTimeDifference(m_auiLastChange[0]) > 50)
-        {
-            bool bA1 = digitalRead(ROT1_A);
-            if(bA1 != bB1) {
-                HandleRotaryScroll(0, -1);
-            } else {
-                HandleRotaryScroll(0, 1);
+        if(bRight) {
+            bool bB1 = digitalRead(ROT1_B);
+            if(bB1 != m_abLastState[0] && bB1 == 1 && helper::GetTimeDifference(m_auiLastChange[0]) > 50)
+            {
+                bool bA1 = digitalRead(ROT1_A);
+                if(bA1 != bB1) {
+                    HandleRotaryScroll(0, -1);
+                } else {
+                    HandleRotaryScroll(0, 1);
+                }
+                m_auiLastChange[0] = helper::GetTime();
             }
-            m_auiLastChange[0] = helper::GetTime();
+            m_abLastState[0] = bB1;
         }
-        m_abLastState[0] = bB1;
 
-        bool bB2 = digitalRead(ROT2_B);
-        if(bB2 != m_abLastState[1] && bB2 == 1 && helper::GetTimeDifference(m_auiLastChange[1]) > 50)
-        {
-            bool bA2 = digitalRead(ROT2_A);
-            if(bA2 != bB2) {
-                HandleRotaryScroll(1, 1);
-            } else {
-                HandleRotaryScroll(1, -1);
+        if(bLeft) {
+            bool bB2 = digitalRead(ROT2_B);
+            if(bB2 != m_abLastState[1] && bB2 == 1 && helper::GetTimeDifference(m_auiLastChange[1]) > 50)
+            {
+                bool bA2 = digitalRead(ROT2_A);
+                if(bA2 != bB2) {
+                    HandleRotaryScroll(1, 1);
+                } else {
+                    HandleRotaryScroll(1, -1);
+                }
+                m_auiLastChange[1] = helper::GetTime();
             }
-            m_auiLastChange[1] = helper::GetTime();
+            m_abLastState[1] = bB2;
         }
-        m_abLastState[1] = bB2;
     }
 }
 
@@ -140,24 +150,24 @@ void Input::HandleRotaryScroll(int8_t iRotaryId, int8_t iDirection)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonRelease(int8_t iButtonId)
+void Input::HandleButtonRelease(int8_t iButtonId, bool bIsLong)
 {
     if(m_pModel) {
         switch (m_pModel->GetUnitType()) {
         case utCom1:
-            HandleButtonReleaseCOM(iButtonId, 1); break;
+            HandleButtonReleaseCOM(iButtonId, 1, bIsLong); break;
         case utCom2:
-            HandleButtonReleaseCOM(iButtonId, 2); break;
+            HandleButtonReleaseCOM(iButtonId, 2, bIsLong); break;
         case utVOR1:
-            HandleButtonReleaseVOR(iButtonId, 1); break;
+            HandleButtonReleaseVOR(iButtonId, 1, bIsLong); break;
         case utVOR2:
-            HandleButtonReleaseVOR(iButtonId, 2); break;
+            HandleButtonReleaseVOR(iButtonId, 2, bIsLong); break;
         case utADF1:
-            HandleButtonReleaseADF(iButtonId, 1); break;
+            HandleButtonReleaseADF(iButtonId, 1, bIsLong); break;
         case utADF2:
-            HandleButtonReleaseADF(iButtonId, 2); break;
+            HandleButtonReleaseADF(iButtonId, 2, bIsLong); break;
         case utXPNDR:
-            HandleButtonReleaseXPNDR(iButtonId); break;
+            HandleButtonReleaseXPNDR(iButtonId, bIsLong); break;
         default:
             break;
         }
@@ -272,7 +282,7 @@ void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId)
+void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong)
 {
     /*
     AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
@@ -311,7 +321,7 @@ void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId)
+void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId, bool bIsLong)
 {
     switch (iButtonId) {
     case 0:
@@ -341,7 +351,7 @@ void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId)
+void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong)
 {
     switch (iButtonId) {
     case 0:
@@ -374,26 +384,28 @@ void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseXPNDR(int8_t iButtonId)
+void Input::HandleButtonReleaseXPNDR(int8_t iButtonId, bool bIsLong)
 {
     switch (iButtonId) {
     case 0: // Go to next digit
         m_uiDigitSelect = (m_uiDigitSelect+1)%4;
         break;
     case 1: // Ident
-        m_pModel->SetStandbyValue(4);
+        m_pModel->SetXpndrIdent();
         break;
     case 2: // ALT
-        m_pModel->SetStandbyValue(3);
+        m_pModel->SetXpndrMode(xmAlt);
         break;
     case 3:// ON
-        m_pModel->SetStandbyValue(2);
+        m_pModel->SetXpndrMode(xmOn);
         break;
     case 4: // SBY
-        m_pModel->SetStandbyValue(1);
+        m_pModel->SetXpndrMode(xmSby);
         break;
     case 5: // OFF
-        m_pModel->SetStandbyValue(0);
+        if(bIsLong) {
+            m_pModel->SetXpndrMode(xmOff);
+        }
         break;
     case 6: // VFR (Set squawk 2000)
         m_pModel->SetActiveValue(2000);

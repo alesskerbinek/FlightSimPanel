@@ -75,6 +75,9 @@ void NavCom::InitializeIO()
     pinMode(ROT2_A, INPUT); // additional switches
     pinMode(ROT2_B, INPUT); // or potentiometer!
 
+    // Connection status LED
+    pinMode(PIN_CONN, OUTPUT);
+
     // Initialize Input and Output objects not eariler than the pins functions are set.
     m_pInput->Initialize();
     m_pOutput->Initialize();
@@ -94,7 +97,7 @@ void NavCom::ProcessLoop(void)
 
 void NavCom::Process1Hz()
 {
-
+    if(m_pNetwork && m_pModel) m_pModel->SetSimConnected(m_pNetwork->IsConnected());
 }
 
 // -------------------------------------------------------------------------

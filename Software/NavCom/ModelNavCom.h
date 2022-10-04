@@ -37,6 +37,20 @@ public:
         m_pSet = pSet;
     }
 
+    //! Returns current transponder mode
+    XpndrModes GetXpndrMode() const
+    {   return m_eXpndrMode; }
+
+    //! Sets current transponder mode
+    void SetXpndrMode(XpndrModes eMode)
+    {   m_eXpndrMode = eMode; }
+
+    //! Sets transponder ident
+    void SetXpndrIdent();
+
+    //! Returns true if transponder is emitting ident
+    bool IsXpndrIdent();
+
     //! Returns current active value on display
     uint32_t GetActiveValue() const;
 
@@ -68,6 +82,12 @@ protected:
 
     //! Minimum Active/Standby value
     uint32_t m_uiMinActive = 0;
+
+    //! Current transponder mode
+    XpndrModes m_eXpndrMode = xmOff;
+
+    //! Current transponder mode
+    uint32_t m_uiXpndrIdentTimestamp = 0;
 };
 
 #endif  // MODELNAVCOM_H

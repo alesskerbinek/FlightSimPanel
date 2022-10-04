@@ -46,6 +46,14 @@ public:
     void SetLoopCount(uint32_t uiValue)
     {   m_uiLoopCnt = uiValue; }
 
+    //! Returns true if connected to X-Plane
+    bool IsSimConnected() const
+    {   return m_bIsSimConnected; }
+
+    //! Sets connected (to X-Plane) flag
+    void SetSimConnected(bool bConnected)
+    {   m_bIsSimConnected = bConnected; }
+
     /**
      * @brief Adds given datagram to transmit queue
      * @param data datagram to be put on queue.
@@ -74,6 +82,9 @@ protected:
 
     //! Main Process loop counter.
     uint32_t m_uiLoopCnt;
+
+    //! Flag indicating whenter we are connected to X-Plane or not
+    bool m_bIsSimConnected;
 
     //! UDP Transmit queue.
     std::queue<xplane::UdpDatagram> m_qTX;

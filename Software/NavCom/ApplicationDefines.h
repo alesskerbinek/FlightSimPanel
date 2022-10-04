@@ -32,6 +32,9 @@
 
 // --------------------------------------------------------------------------
 
+// Connection status LED
+#define PIN_CONN 0
+
 // NavCom Button pins
 #define PIN_SW1 5
 #define PIN_SW2 17
@@ -140,6 +143,15 @@ typedef  enum {
     utADF2,
     utXPNDR
 } UnitTypes;
+
+//! Transponder modes
+typedef  enum {
+    xmUndefined = 0,
+    xmOff,
+    xmSby,
+    xmOn,
+    xmAlt
+} XpndrModes;
 
 // --------------------------------------------------------------------------
 

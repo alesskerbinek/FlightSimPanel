@@ -26,7 +26,7 @@ public:
 
 private:
     //! Check rotary encoders states
-    void CheckRotaries();
+    void CheckRotaries(bool bLeft, bool bRight);
 
     //! Check button states
     void CheckButtons();
@@ -47,19 +47,19 @@ private:
     void HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection);
 
     //! Handles button press
-    void HandleButtonRelease(int8_t iButtonId);
+    void HandleButtonRelease(int8_t iButtonId, bool bIsLong);
 
     //! Handles button press for Radio unit
-    void HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId);
+    void HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong);
 
     //! Handles button press for Nav unit
-    void HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId);
+    void HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId, bool bIsLong);
 
     //! Handles button press for ADF unit
-    void HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId);
+    void HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong);
 
     //! Handles button press for Transponder
-    void HandleButtonReleaseXPNDR(int8_t iButtonId);
+    void HandleButtonReleaseXPNDR(int8_t iButtonId, bool bIsLong);
 
 private:
     //! Model pointer;

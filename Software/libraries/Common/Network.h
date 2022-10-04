@@ -32,8 +32,7 @@ public:
     virtual void Process();
 
     //! Returns true if connected to WiFi
-    bool IsConnected()
-    {   return m_eState > nsWaitConnected; }
+    bool IsConnected();
 
     //! Get network parameters from settings. Reimplement in inherited class.
     virtual void GetNetworkParameters(types::NetworkParameters* sParam) = 0;
@@ -110,6 +109,9 @@ protected:
 
     //! Last state machine state change
     uint32_t m_uiLastStateChange = 0;
+
+    //! Last message received timestamp
+    uint32_t m_uiLastRxTime = 0;
 
     //! Strucure holding network settings
     types::NetworkParameters m_sParams;

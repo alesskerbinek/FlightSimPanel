@@ -97,3 +97,17 @@ void ModelNavCom::IncrStandbyValue(int32_t iIncrement)
 }
 
 //-----------------------------------------------------------------------------
+
+void ModelNavCom::SetXpndrIdent()
+{
+    m_uiXpndrIdentTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+bool ModelNavCom::IsXpndrIdent()
+{
+    return (m_uiXpndrIdentTimestamp > 0 && helper::GetTimeDifference(m_uiXpndrIdentTimestamp) < 5000);
+}
+
+//-----------------------------------------------------------------------------

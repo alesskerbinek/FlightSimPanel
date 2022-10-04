@@ -21,9 +21,19 @@ void Network::Initialize()
 
 // -------------------------------------------------------------------------
 
+bool Network::IsConnected()
+{
+    // Declare we are connected if UDP server is established + we received any message in last 3s.
+    return m_eState == nsListening
+            && m_uiLastRxTime > 0
+            && helper::GetTimeDifference(m_uiLastRxTime) < 3000;
+}
+
+// -------------------------------------------------------------------------
+
 void Network::Send(const uint8_t *auiBuffer, uint16_t uiSize, IPAddress ipAddress, uint16_t uiPort)
 {
-    if(IsConnected()) {
+    if(m_eState > nsWaitConnected) {
         //Serial.printf("Send %s, %i\n", (const char*)auiBuffer, uiSize);
         AUdp.writeTo(auiBuffer, uiSize, ipAddress, uiPort);
     }
@@ -40,6 +50,9 @@ void Network::ConnectToWiFi(char* acSSID, char* acPass)
 
 void Network::ParseUDP(AsyncUDPPacket &packet)
 {
+    m_uiLastRxTime = helper::GetTime();
+    Serial.printf("MSG\n");
+
     if(strncmp((char*)packet.data(), "DATA", 4) == 0) {
         for(int i = 5; i < packet.length(); i += 4+8*4) {
             switch (packet.data()[i]) {

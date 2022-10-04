@@ -48,7 +48,10 @@ private:
     void SetSquawk(uint32_t uiVal);
 
     //! Sets transponder mode
-    void SetMode(uint32_t uiVal);
+    void SetMode(XpndrModes eMode);
+
+    //! Sets transponder ident indication
+    void SetIdent();
 
 private:
     //! Model pointer;
