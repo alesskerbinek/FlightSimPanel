@@ -62,9 +62,9 @@ void Application::ProcessLoop(void)
 {
     m_uiLoopCnt++;
 
-    // 100Hz = Every millisecond
-    if(helper::GetTime() > m_ui1000HzTimeout) {
-        m_ui1000HzTimeout = helper::GetTime();
+    // 1000Hz = Every millisecond
+    if(micros()-m_ui1000HzTimeout >= 1000) {
+        m_ui1000HzTimeout = helper::GetTimeUs();
         Process1000Hz();
     }
 

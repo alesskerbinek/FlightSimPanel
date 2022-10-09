@@ -14,7 +14,18 @@ namespace helper {
 //-----------------------------------------------------------------------------
 
 /**
-* Function returning the time since system boot.
+* Function returning the time in microseconds since system boot.
+* The value overflows in approx. 70 minutes.
+* @return microseconds seconds since boot
+*/
+inline uint32_t GetTimeUs()
+{ return micros(); }
+
+
+//-----------------------------------------------------------------------------
+
+/**
+* Function returning the time in miliseconds since system boot.
 * @return miliseconds since boot
 */
 inline uint32_t GetTime()

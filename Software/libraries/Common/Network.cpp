@@ -51,7 +51,6 @@ void Network::ConnectToWiFi(char* acSSID, char* acPass)
 void Network::ParseUDP(AsyncUDPPacket &packet)
 {
     m_uiLastRxTime = helper::GetTime();
-    Serial.printf("MSG\n");
 
     if(strncmp((char*)packet.data(), "DATA", 4) == 0) {
         for(int i = 5; i < packet.length(); i += 4+8*4) {
