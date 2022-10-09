@@ -53,6 +53,12 @@ private:
     //! Sets transponder ident indication
     void SetIdent();
 
+    //! Sets transponder shutdown indication
+    void SetShutdown();
+
+    //! Turns all display indications off
+    void SetDisplayOff();
+
 private:
     //! Model pointer;
     ModelNavCom* m_pModel = nullptr;

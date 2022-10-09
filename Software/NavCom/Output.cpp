@@ -83,11 +83,17 @@ void Output::UpdateValues()
             // TODO or SetTime(m_pModel->GetElapsedTime());
             break;
         case utXPNDR:
-            SetSquawk(m_pModel->GetActiveValue());
-            if(m_pModel->IsXpndrIdent()) {
-                SetIdent();
+            if(m_pModel->GetXpndrMode() != xmOff) {
+                SetSquawk(m_pModel->GetActiveValue());
+                if(m_pModel->IsXpndrIdent()) {
+                    SetIdent();
+                } else if(m_pModel->IsXpndrShutdown()) {
+                    SetShutdown();
+                } else {
+                    SetMode(m_pModel->GetXpndrMode());
+                }
             } else {
-                SetMode(m_pModel->GetXpndrMode());
+                SetDisplayOff();
             }
             break;
         default:
@@ -174,11 +180,6 @@ void Output::SetMode(XpndrModes eMode)
     if(DIGIT_COUNT >= 3)
     {
         switch (eMode) {
-        case xmOff:
-            m_auiDigitValues[0] = CH_O;
-            m_auiDigitValues[1] = CH_F;
-            m_auiDigitValues[2] = CH_F;
-            break;
         case xmSby:
             m_auiDigitValues[0] = CH_S;
             m_auiDigitValues[1] = CH_B;
@@ -218,3 +219,38 @@ void Output::SetIdent()
         }
     }
 }
+
+// -------------------------------------------------------------------------
+
+void Output::SetShutdown()
+{
+    if(DIGIT_COUNT >= 3)
+    {
+        m_auiDigitValues[0] = CH_O;
+        m_auiDigitValues[1] = CH_F;
+        m_auiDigitValues[2] = CH_F;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetDisplayOff()
+{
+    if(DIGIT_COUNT >= 12)
+    {
+        m_auiDigitValues[11] = CH_SPACE;
+        m_auiDigitValues[10] = CH_SPACE;
+        m_auiDigitValues[9]  = CH_SPACE;
+        m_auiDigitValues[8]  = CH_SPACE;
+        m_auiDigitValues[7]  = CH_SPACE;
+        m_auiDigitValues[6]  = CH_SPACE;
+        m_auiDigitValues[5]  = CH_SPACE;
+        m_auiDigitValues[4]  = CH_SPACE;
+        m_auiDigitValues[3]  = CH_SPACE;
+        m_auiDigitValues[2]  = CH_SPACE;
+        m_auiDigitValues[1]  = CH_SPACE;
+        m_auiDigitValues[0]  = CH_SPACE;
+    }
+}
+
+// -------------------------------------------------------------------------

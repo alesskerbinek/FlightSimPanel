@@ -111,3 +111,17 @@ bool ModelNavCom::IsXpndrIdent()
 }
 
 //-----------------------------------------------------------------------------
+
+void ModelNavCom::SetXpndrShutdown(bool bShutdown)
+{
+    m_bXpndrShutdown = bShutdown;
+}
+
+//-----------------------------------------------------------------------------
+
+bool ModelNavCom::IsXpndrShutdown()
+{
+    return m_bXpndrShutdown;
+}
+
+//-----------------------------------------------------------------------------

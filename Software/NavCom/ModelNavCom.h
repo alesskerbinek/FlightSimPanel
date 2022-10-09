@@ -51,6 +51,13 @@ public:
     //! Returns true if transponder is emitting ident
     bool IsXpndrIdent();
 
+    //! Sets transponder shutdown - wait and check that Off button is
+    //! pressed for couple of seconds then change mode to Off.
+    void SetXpndrShutdown(bool bShutdown);
+
+    //! Returns true if transponder is in shutdown state
+    bool IsXpndrShutdown();
+
     //! Returns current active value on display
     uint32_t GetActiveValue() const;
 
@@ -88,6 +95,9 @@ protected:
 
     //! Current transponder mode
     uint32_t m_uiXpndrIdentTimestamp = 0;
+
+    //! Set transponder for shutdown
+    bool m_bXpndrShutdown = false;
 };
 
 #endif  // MODELNAVCOM_H

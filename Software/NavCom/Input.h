@@ -8,6 +8,14 @@
 
 class Input
 {
+private:
+    enum ButtonEvents {
+        beUndefined,
+        bePressed,
+        beReleased,
+        beLongPress,
+    };
+
 public:
     //! Public constructor.
     Input();
@@ -46,20 +54,22 @@ private:
     //! Handles rotary encoder change for Transponder
     void HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection);
 
-    //! Handles button press
-    void HandleButtonRelease(int8_t iButtonId, bool bIsLong);
+    //! Handles button event. In case the button is pressed and hold down for more than
+    //! 1000 cycles the events are declared in the following order: Pressed, LongPress, Released.
+    //! Every Pressed event will be followed by Released.
+    void HandleButtonEvent(int8_t iButtonId, ButtonEvents eEvent);
 
-    //! Handles button press for Radio unit
-    void HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong);
+    //! Handles button event for Radio unit
+    void HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents eEvent);
 
-    //! Handles button press for Nav unit
-    void HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId, bool bIsLong);
+    //! Handles button event for Nav unit
+    void HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents eEvent);
 
-    //! Handles button press for ADF unit
-    void HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong);
+    //! Handles button event for ADF unit
+    void HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents eEvent);
 
-    //! Handles button press for Transponder
-    void HandleButtonReleaseXPNDR(int8_t iButtonId, bool bIsLong);
+    //! Handles button event for Transponder
+    void HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent);
 
 private:
     //! Model pointer;

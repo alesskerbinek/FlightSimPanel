@@ -3,6 +3,9 @@
 #include "XPlaneDef.h"
 #include "ApplicationDefines.h"
 
+#define BTN_PRESS_CNT       50
+#define BTN_LONGPRESS_CNT   1000
+
 // -------------------------------------------------------------------------
 
 Input::Input()
@@ -65,15 +68,19 @@ void Input::CheckButtons()
             // On press count up how long it is pressed
             if(digitalRead(m_auiButtonAddresses[ui]) == false) {
                 m_auiButtonValues[ui]++;
-                // Check for long-press
-                if(m_auiButtonValues[ui] > 1000) {
-                    HandleButtonRelease(ui, true);
-                    m_auiButtonValues[ui] = 0;
+                // If button pressed for 50 cycles, we declare press event
+                if(m_auiButtonValues[ui] == BTN_PRESS_CNT) {
+                    HandleButtonEvent(ui, ButtonEvents::bePressed);
+                }
+                // If pressed for more than 1000 cycles, we declare long-press
+                if(m_auiButtonValues[ui] > BTN_LONGPRESS_CNT) {
+                    HandleButtonEvent(ui, ButtonEvents::beLongPress);
+                    m_auiButtonValues[ui] = BTN_PRESS_CNT;
                 }
             } else {
-                // On release check if it was pressed long enough to make action
-                if(m_auiButtonValues[ui] > 50) {
-                    HandleButtonRelease(ui, false);
+                // On release check if it was pressed long enough to declare release
+                if(m_auiButtonValues[ui] > BTN_PRESS_CNT) {
+                    HandleButtonEvent(ui, ButtonEvents::beReleased);
                 }
                 m_auiButtonValues[ui] = 0;
             }
@@ -150,24 +157,24 @@ void Input::HandleRotaryScroll(int8_t iRotaryId, int8_t iDirection)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonRelease(int8_t iButtonId, bool bIsLong)
+void Input::HandleButtonEvent(int8_t iButtonId, ButtonEvents eEvent)
 {
     if(m_pModel) {
         switch (m_pModel->GetUnitType()) {
         case utCom1:
-            HandleButtonReleaseCOM(iButtonId, 1, bIsLong); break;
+            HandleButtonEventCOM(iButtonId, 1, eEvent); break;
         case utCom2:
-            HandleButtonReleaseCOM(iButtonId, 2, bIsLong); break;
+            HandleButtonEventCOM(iButtonId, 2, eEvent); break;
         case utVOR1:
-            HandleButtonReleaseVOR(iButtonId, 1, bIsLong); break;
+            HandleButtonEventVOR(iButtonId, 1, eEvent); break;
         case utVOR2:
-            HandleButtonReleaseVOR(iButtonId, 2, bIsLong); break;
+            HandleButtonEventVOR(iButtonId, 2, eEvent); break;
         case utADF1:
-            HandleButtonReleaseADF(iButtonId, 1, bIsLong); break;
+            HandleButtonEventADF(iButtonId, 1, eEvent); break;
         case utADF2:
-            HandleButtonReleaseADF(iButtonId, 2, bIsLong); break;
+            HandleButtonEventADF(iButtonId, 2, eEvent); break;
         case utXPNDR:
-            HandleButtonReleaseXPNDR(iButtonId, bIsLong); break;
+            HandleButtonEventXPNDR(iButtonId, eEvent); break;
         default:
             break;
         }
@@ -282,7 +289,7 @@ void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong)
+void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents eEvent)
 {
     /*
     AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
@@ -290,10 +297,12 @@ void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong
 
     switch (iButtonId) {
     case 0:
-        m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+        if(eEvent == beReleased) {
+            m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+        }
         break;
     case 2: // On/Off
-        if(m_pModel) {
+        if(eEvent == beReleased && m_pModel) {
             //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1Power : xplane::DataRefs::drCom1Power,
@@ -301,14 +310,14 @@ void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong
         }
         break;
     case 3: // Flip
-        if(m_pModel) {
+        if(eEvent == beReleased && m_pModel) {
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
                         iComId == 1 ? xplane::Commands::cmCom1Flip : xplane::Commands::cmCom2Flip));
             m_uiDigitSelect = 0;
         }
         break;
     case 4: // Set Emergency frequency
-        if(m_pModel) {
+        if(eEvent == beReleased && m_pModel) {
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1ActiveFreq : xplane::DataRefs::drCom2ActiveFreq,
                         (uint32_t)0x47ed4e00)); // == 121.500
@@ -321,17 +330,19 @@ void Input::HandleButtonReleaseCOM(int8_t iButtonId, int8_t iComId, bool bIsLong
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId, bool bIsLong)
+void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents eEvent)
 {
     switch (iButtonId) {
     case 0:
-        m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+        if(eEvent == beReleased) {
+            m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+        }
         break;
     case 1:
         // TODO Show OBS
         break;
     case 3:
-        if(m_pModel) {
+        if(eEvent == beReleased && m_pModel) {
 //            if(m_pModel->IsDemoMode()) {
 //                uint32_t uiTmp = m_pModel->GetActiveValue();
 //                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
@@ -351,11 +362,13 @@ void Input::HandleButtonReleaseVOR(int8_t iButtonId, int8_t iVorId, bool bIsLong
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong)
+void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents eEvent)
 {
     switch (iButtonId) {
     case 0:
-        m_uiDigitSelect = (m_uiDigitSelect+1)%3;
+        if(eEvent == beReleased) {
+            m_uiDigitSelect = (m_uiDigitSelect+1)%3;
+        }
         break;
     case 2:
         // TODO SET/RST
@@ -365,7 +378,7 @@ void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong
         break;
     case 4:
         // TODO <->/FREQ
-        if(m_pModel) {
+        if(eEvent == beReleased && m_pModel) {
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
                         iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
             m_uiDigitSelect = 0;
@@ -384,31 +397,47 @@ void Input::HandleButtonReleaseADF(int8_t iButtonId, int8_t iAdfId, bool bIsLong
 
 // -------------------------------------------------------------------------
 
-void Input::HandleButtonReleaseXPNDR(int8_t iButtonId, bool bIsLong)
+void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
 {
     switch (iButtonId) {
     case 0: // Go to next digit
-        m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
+            m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+        }
         break;
     case 1: // Ident
-        m_pModel->SetXpndrIdent();
+        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
+            m_pModel->SetXpndrIdent();
+        }
         break;
     case 2: // ALT
-        m_pModel->SetXpndrMode(xmAlt);
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetXpndrMode(xmAlt);
+        }
         break;
     case 3:// ON
-        m_pModel->SetXpndrMode(xmOn);
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetXpndrMode(xmOn);
+        }
         break;
     case 4: // SBY
-        m_pModel->SetXpndrMode(xmSby);
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetXpndrMode(xmSby);
+        }
         break;
     case 5: // OFF
-        if(bIsLong) {
+        if(eEvent == bePressed && m_pModel) {
+            m_pModel->SetXpndrShutdown(true);
+        } else if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetXpndrShutdown(false);
+        } else if(eEvent == beLongPress && m_pModel) {
             m_pModel->SetXpndrMode(xmOff);
         }
         break;
     case 6: // VFR (Set squawk 2000)
-        m_pModel->SetActiveValue(2000);
+        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
+            m_pModel->SetActiveValue(2000);
+        }
         break;
     default:
         break;
