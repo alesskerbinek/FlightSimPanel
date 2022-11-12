@@ -125,3 +125,25 @@ bool ModelNavCom::IsXpndrShutdown()
 }
 
 //-----------------------------------------------------------------------------
+
+uint8_t ModelNavCom::GetVolume() const
+{
+    return m_uiVolume;
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetVolume(int8_t iValue)
+{
+    m_uiVolume = helper::GetMinMax(int(iValue), 0, 100);
+    m_uiVolumeTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+bool ModelNavCom::IsVolumeCommand()
+{
+    return (m_uiVolumeTimestamp > 0 && helper::GetTimeDifference(m_uiVolumeTimestamp) < 2000);
+}
+
+//-----------------------------------------------------------------------------

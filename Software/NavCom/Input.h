@@ -49,10 +49,10 @@ private:
     void HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iVorId);
 
     //! Handles rotary encoder change for ADF unit
-    void HandleRotaryScrollADF(int8_t iRotaryId, int8_t iDirection, int8_t iAdfId);
+    void HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_t iAdfId);
 
     //! Handles rotary encoder change for Transponder
-    void HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection);
+    void HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection);
 
     //! Handles button event. In case the button is pressed and hold down for more than
     //! 1000 cycles the events are declared in the following order: Pressed, LongPress, Released.

@@ -59,6 +59,9 @@ private:
     //! Turns all display indications off
     void SetDisplayOff();
 
+    //! Sets unit volume value
+    void SetVolume(uint8_t uiVol);
+
 private:
     //! Model pointer;
     ModelNavCom* m_pModel = nullptr;

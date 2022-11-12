@@ -117,9 +117,9 @@ void Input::CheckRotaries(bool bLeft, bool bRight)
             {
                 bool bA2 = digitalRead(ROT2_A);
                 if(bA2 != bB2) {
-                    HandleRotaryScroll(1, 1);
-                } else {
                     HandleRotaryScroll(1, -1);
+                } else {
+                    HandleRotaryScroll(1, 1);
                 }
                 m_auiLastChange[1] = helper::GetTime();
             }
@@ -188,26 +188,40 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
     if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
         if(m_uiDigitSelect == 1) {
-            xplane::Commands cmd;
-            if(iComId == 1) {
-                cmd = iDirection > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown;
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                if(iComId == 1) {
+                    cmd = iDirection > 0 ? xplane::Commands::cmCom1StandbyCoarseUp : xplane::Commands::cmCom1StandbyCoarseDown;
+                } else {
+                    cmd = iDirection > 0 ? xplane::Commands::cmCom2StandbyCoarseUp : xplane::Commands::cmCom2StandbyCoarseDown;
+                }
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmCom2StandbyCoarseUp : xplane::Commands::cmCom2StandbyCoarseDown;
+                m_pModel->IncrStandbyValue(iDirection*1000);
             }
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            xplane::Commands cmd;
-            if(iComId == 1) {
-                cmd = iDirection > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down;
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                if(iComId == 1) {
+                    cmd = iDirection > 0 ? xplane::Commands::cmCom1Standby833Up : xplane::Commands::cmCom1Standby833Down;
+                } else {
+                    cmd = iDirection > 0 ? xplane::Commands::cmCom2Standby833Up : xplane::Commands::cmCom2Standby833Down;
+                }
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmCom2Standby833Up : xplane::Commands::cmCom2Standby833Down;
+                m_pModel->IncrStandbyValue(iDirection*5);
+                // Skip invalid values: 20, 45, 70, 95!
+                uint32_t uiCur = m_pModel->GetStandbyValue() % 100;
+                if(uiCur == 20 || uiCur == 45 || uiCur == 70 || uiCur == 95) {
+                    m_pModel->IncrStandbyValue(iDirection*5);
+                }
             }
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         }
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
     {
-        // TODO Volume
+        // This is just for display. No action is performed on simulator.
+        m_pModel->SetVolume(m_pModel->GetVolume()+iDirection*5);
     }
 }
 
@@ -218,70 +232,88 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
     if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
         if(m_uiDigitSelect == 1) {
-            xplane::Commands cmd;
-            if(iVorId == 1) {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown;
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                if(iVorId == 1) {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown;
+                } else {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav2StandbyCoarseDown;
+                }
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav2StandbyCoarseDown;
+                m_pModel->IncrStandbyValue(iDirection*1000);
             }
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
-            //m_pModel->IncrStandbyValue(iDir*1000);
         } else {
-            xplane::Commands cmd;
-            if(iVorId == 1) {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown;
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                if(iVorId == 1) {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown;
+                } else {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav2StandbyFineDown;
+                }
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav2StandbyFineDown;
+                m_pModel->IncrStandbyValue(iDirection*25);
             }
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
-            //m_pModel->IncrStandbyValue(iDir*5);
         }
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
     {
-        xplane::Commands cmd;
-        if(iVorId == 1) {
-            cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
+        if(m_pModel->IsSimConnected()) {
+            xplane::Commands cmd;
+            if(iVorId == 1) {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
+            } else {
+                cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav2ObsDown;
+            }
+            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav2ObsDown;
-        }
-        m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
-    }
-}
-
-// -------------------------------------------------------------------------
-
-void Input::HandleRotaryScrollADF(int8_t iRotaryId, int8_t iDirection, int8_t iAdfId)
-{
-    if(m_pModel)
-    {
-        if(m_uiDigitSelect == 0) {
-            // TODO change XX00
-        } else if(m_uiDigitSelect == 1) {
-            // TODO change 00X0
-        } else {
-            // TODO change 000X
+            m_pModel->IncrStandbyValue(iDirection*100); // TODO
         }
     }
 }
 
 // -------------------------------------------------------------------------
 
-void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
+void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_t iAdfId)
 {
     if(m_pModel)
     {
-        if(m_uiDigitSelect == 0) {
-            // TODO change X000
+        if(m_uiDigitSelect == 0) { // Change XX00
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrStandbyValue(iDirection*100);
+            }
+        } else if(m_uiDigitSelect == 1) { // Change 00X0
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrStandbyValue(iDirection*10);
+            }
+        } else { // Change 000X
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrStandbyValue(iDirection);
+            }
+        }
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
+{
+    if(m_pModel)
+    {
+        if(m_uiDigitSelect == 0) { // Change X000
             m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*1000);
-        } else if(m_uiDigitSelect == 1) {
-            // TODO change 0X00
+        } else if(m_uiDigitSelect == 1) { // Change 0X00
             m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*100);
-        } else if(m_uiDigitSelect == 2) {
-            // TODO change 00X0
+        } else if(m_uiDigitSelect == 2) { // Change 00X0
             m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*10);
-        } else {
-            // TODO change 000X
+        } else { // Change 000X
             m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection);
         }
     }
@@ -292,7 +324,7 @@ void Input::HandleRotaryScrollXPNDR(int8_t iRotaryId, int8_t iDirection)
 void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents eEvent)
 {
     /*
-    AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41));
+    AddToTxQueue(UdpDatagram(UdpDataType::dtCHAR, 0, (uint32_t)0x41)); // TODO remove if not working
     */
 
     switch (iButtonId) {
@@ -303,24 +335,40 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
         break;
     case 2: // On/Off
         if(eEvent == beReleased && m_pModel) {
-            //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
+            if(m_pModel->IsSimConnected()) {
+                // Does this work ???
+                //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1Power : xplane::DataRefs::drCom1Power,
                         (uint32_t)0)); // == Off
+            } else {
+                // TODO
+            }
         }
         break;
     case 3: // Flip
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
-                        iComId == 1 ? xplane::Commands::cmCom1Flip : xplane::Commands::cmCom2Flip));
-            m_uiDigitSelect = 0;
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iComId == 1 ? xplane::Commands::cmCom1Flip : xplane::Commands::cmCom2Flip));
+                m_uiDigitSelect = 0;
+            } else {
+                uint32_t uiTmp = m_pModel->GetActiveValue();
+                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+                m_pModel->SetStandbyValue(uiTmp);
+                //m_pModel->SaveSettings();
+            }
         }
         break;
     case 4: // Set Emergency frequency
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1ActiveFreq : xplane::DataRefs::drCom2ActiveFreq,
                         (uint32_t)0x47ed4e00)); // == 121.500
+            } else {
+                m_pModel->SetActiveValue(121500);
+            }
         }
         break;
     default:
@@ -343,16 +391,16 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
         break;
     case 3:
         if(eEvent == beReleased && m_pModel) {
-//            if(m_pModel->IsDemoMode()) {
-//                uint32_t uiTmp = m_pModel->GetActiveValue();
-//                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
-//                m_pModel->SetStandbyValue(uiTmp);
-//                m_pModel->SaveSettings();
-//            } else {
+            if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
                             iVorId == 1 ? xplane::Commands::cmNav1Flip : xplane::Commands::cmNav2Flip));
                 m_uiDigitSelect = 0;
-//            }
+            } else {
+                uint32_t uiTmp = m_pModel->GetActiveValue();
+                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+                m_pModel->SetStandbyValue(uiTmp);
+                //m_pModel->SaveSettings();
+            }
         }
         break;
     default:
@@ -379,9 +427,16 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
     case 4:
         // TODO <->/FREQ
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
-                        iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
-            m_uiDigitSelect = 0;
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
+                m_uiDigitSelect = 0;
+            } else {
+                uint32_t uiTmp = m_pModel->GetActiveValue();
+                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+                m_pModel->SetStandbyValue(uiTmp);
+                //m_pModel->SaveSettings();
+            }
         }
         break;
     case 5:

@@ -61,14 +61,18 @@ void Output::UpdateValues()
     if(m_pModel)
     {
         // Set Connection status LED. We turn LED on with LOW.
-        digitalWrite(PIN_CONN, m_pModel->IsSimConnected() ? LOW : HIGH);
+        digitalWrite(PIN_CONN, m_pModel->IsSimConnected() ? HIGH : LOW);
 
         // Unit specific output
         switch (m_pModel->GetUnitType()) {
         case utCom1:
         case utCom2:
             SetActiveMHz(m_pModel->GetActiveValue(), true);
-            SetStandbyMHz(m_pModel->GetStandbyValue(), true);
+            if(m_pModel->IsVolumeCommand()) {
+                SetVolume(m_pModel->GetVolume());
+            } else {
+                SetStandbyMHz(m_pModel->GetStandbyValue(), true);
+            }
             break;
         case utVOR1:
         case utVOR2:
@@ -143,7 +147,7 @@ void Output::SetActiveKHz(uint32_t uiVal)
         m_auiDigitValues[3] = m_auiChars[uiVal % 10];
         m_auiDigitValues[2] = m_auiChars[uiVal/10 % 10];
         m_auiDigitValues[1] = m_auiChars[uiVal/100 % 10];
-        m_auiDigitValues[0] = m_auiChars[uiVal/1000 % 10];
+        m_auiDigitValues[0] = uiVal >= 1000 ? m_auiChars[uiVal/1000 % 10] : CH_SPACE;
     }
 }
 
@@ -156,7 +160,7 @@ void Output::SetStandbyKHz(uint32_t uiVal)
         m_auiDigitValues[9]  = m_auiChars[uiVal % 10];
         m_auiDigitValues[8]  = m_auiChars[uiVal/10 % 10];
         m_auiDigitValues[7]  = m_auiChars[uiVal/100 % 10];
-        m_auiDigitValues[6]  = m_auiChars[uiVal/1000 % 10];
+        m_auiDigitValues[6]  = uiVal >= 1000 ? m_auiChars[uiVal/1000 % 10] : CH_SPACE;
     }
 }
 
@@ -236,20 +240,23 @@ void Output::SetShutdown()
 
 void Output::SetDisplayOff()
 {
+    for(int i=0; i<DIGIT_COUNT; i++) {
+        m_auiDigitValues[i] = CH_SPACE;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetVolume(uint8_t uiVol)
+{
     if(DIGIT_COUNT >= 12)
     {
-        m_auiDigitValues[11] = CH_SPACE;
-        m_auiDigitValues[10] = CH_SPACE;
-        m_auiDigitValues[9]  = CH_SPACE;
-        m_auiDigitValues[8]  = CH_SPACE;
-        m_auiDigitValues[7]  = CH_SPACE;
-        m_auiDigitValues[6]  = CH_SPACE;
-        m_auiDigitValues[5]  = CH_SPACE;
-        m_auiDigitValues[4]  = CH_SPACE;
-        m_auiDigitValues[3]  = CH_SPACE;
-        m_auiDigitValues[2]  = CH_SPACE;
-        m_auiDigitValues[1]  = CH_SPACE;
-        m_auiDigitValues[0]  = CH_SPACE;
+        m_auiDigitValues[11] = m_auiChars[uiVol % 10];
+        m_auiDigitValues[10] = uiVol >= 10 ? m_auiChars[uiVol/10 % 10] : CH_SPACE;
+        m_auiDigitValues[9]  = uiVol >= 100 ? m_auiChars[uiVol/100 % 10] : CH_SPACE;
+        m_auiDigitValues[8]  = CH_L;
+        m_auiDigitValues[7]  = CH_O;
+        m_auiDigitValues[6]  = CH_V;
     }
 }
 

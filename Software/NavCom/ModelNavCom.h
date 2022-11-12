@@ -77,6 +77,15 @@ public:
     UnitTypes GetUnitType()
     {   return m_pSetNavCom ? m_pSetNavCom->GetUnitType() : utUndefined; }
 
+    //! Returns current standby value on display
+    uint8_t GetVolume() const;
+
+    //! Sets current standby value on display
+    void SetVolume(int8_t iValue);
+
+    //! Returns true if volume setting is in progress
+    bool IsVolumeCommand();
+
 protected:
     //! The only static singleton object.
     static ModelNavCom* s_pInstanceNavCom;
@@ -93,11 +102,17 @@ protected:
     //! Current transponder mode
     XpndrModes m_eXpndrMode = xmOff;
 
-    //! Current transponder mode
+    //! Timestamp of last ident command
     uint32_t m_uiXpndrIdentTimestamp = 0;
 
     //! Set transponder for shutdown
     bool m_bXpndrShutdown = false;
+
+    //! Unit volume [0-100%]
+    uint8_t m_uiVolume = 0;
+
+    //! Timestamp of last volume command
+    uint32_t m_uiVolumeTimestamp = 0;
 };
 
 #endif  // MODELNAVCOM_H

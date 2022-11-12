@@ -108,6 +108,8 @@
 #define CH_O 0xC0
 #define CH_S 0x92
 #define CH_T 0x87
+#define CH_U 0xC1
+#define CH_V 0xC1 //0x8D
 #define CH_Y 0x91
 #define CH_Z 0xA4
 #define CH_SPACE 0xFF
