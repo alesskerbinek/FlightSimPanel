@@ -10,7 +10,7 @@ The directory structure is as follows:
 ├── Hardware
 │    ├── NavCom     # VOR/Radio/ADF/XPNDR unit
 │    │    ├── PCB
-│    │    └── Case*
+│    │    └── Case
 │    ├── Audio*     # Audio Panel unit
 │    │    ├── PCB*
 │    │    └── Case*
