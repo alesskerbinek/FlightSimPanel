@@ -60,8 +60,8 @@ void Output::UpdateValues()
 {
     if(m_pModel)
     {
-        // Set Connection status LED. We turn LED on with LOW.
-        digitalWrite(PIN_CONN, m_pModel->IsSimConnected() ? HIGH : LOW);
+        // Set Connection status LED. We turn LED on with HIGH.
+        digitalWrite(PIN_CONN, m_pModel->IsSimConnected() ? LOW : HIGH);
 
         // Unit specific output
         switch (m_pModel->GetUnitType()) {

@@ -197,7 +197,7 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                m_pModel->IncrStandbyValue(iDirection*1000);
+                m_pModel->IncrStandbyValue(iDirection*1000, 0);
             }
         } else {
             if(m_pModel->IsSimConnected()) {
@@ -209,11 +209,11 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                m_pModel->IncrStandbyValue(iDirection*5);
+                m_pModel->IncrStandbyValue(iDirection*5, 1000);
                 // Skip invalid values: 20, 45, 70, 95!
                 uint32_t uiCur = m_pModel->GetStandbyValue() % 100;
                 if(uiCur == 20 || uiCur == 45 || uiCur == 70 || uiCur == 95) {
-                    m_pModel->IncrStandbyValue(iDirection*5);
+                    m_pModel->IncrStandbyValue(iDirection*5, 1000);
                 }
             }
         }
@@ -241,7 +241,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                m_pModel->IncrStandbyValue(iDirection*1000);
+                m_pModel->IncrStandbyValue(iDirection*1000, 0);
             }
         } else {
             if(m_pModel->IsSimConnected()) {
@@ -253,7 +253,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
-                m_pModel->IncrStandbyValue(iDirection*25);
+                m_pModel->IncrStandbyValue(iDirection*50, 1000);
             }
         }
     }
@@ -268,7 +268,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
             }
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            m_pModel->IncrStandbyValue(iDirection*100); // TODO
+            m_pModel->IncrStandbyValue(iDirection*100, 1000); // TODO
         }
     }
 }
@@ -283,19 +283,19 @@ void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection*100);
+                m_pModel->IncrStandbyValue(iDirection*100, 0);
             }
         } else if(m_uiDigitSelect == 1) { // Change 00X0
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection*10);
+                m_pModel->IncrStandbyValue(iDirection*10, 100);
             }
         } else { // Change 000X
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection);
+                m_pModel->IncrStandbyValue(iDirection, 10);
             }
         }
     }
@@ -308,13 +308,13 @@ void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
     if(m_pModel)
     {
         if(m_uiDigitSelect == 0) { // Change X000
-            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*1000);
+            m_pModel->IncrActiveValue(iDirection*1000, 8000);
         } else if(m_uiDigitSelect == 1) { // Change 0X00
-            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*100);
+            m_pModel->IncrActiveValue(iDirection*100, 800);
         } else if(m_uiDigitSelect == 2) { // Change 00X0
-            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection*10);
+            m_pModel->IncrActiveValue(iDirection*10, 80);
         } else { // Change 000X
-            m_pModel->SetActiveValue(m_pModel->GetActiveValue()+iDirection);
+            m_pModel->IncrActiveValue(iDirection, 8);
         }
     }
 }
@@ -380,6 +380,11 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
 
 void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents eEvent)
 {
+    Serial.print("BTN ID:");
+    Serial.print(iButtonId);
+    Serial.print("Event:");
+    Serial.println(int(eEvent));
+
     switch (iButtonId) {
     case 0:
         if(eEvent == beReleased) {

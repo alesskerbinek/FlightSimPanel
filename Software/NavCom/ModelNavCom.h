@@ -64,6 +64,9 @@ public:
     //! Sets current active value on display
     void SetActiveValue(uint32_t uiValue);
 
+    //! Increases/decreases current active value on display
+    void IncrActiveValue(int32_t iIncrement, uint32_t uiOverflow);
+
     //! Returns current standby value on display
     uint32_t GetStandbyValue() const;
 
@@ -71,7 +74,7 @@ public:
     void SetStandbyValue(uint32_t uiValue);
 
     //! Increases/decreases current standby value on display
-    void IncrStandbyValue(int32_t iIncrement);
+    void IncrStandbyValue(int32_t iIncrement, uint32_t uiOverflow);
 
     //! Returns this unit type
     UnitTypes GetUnitType()
@@ -85,6 +88,10 @@ public:
 
     //! Returns true if volume setting is in progress
     bool IsVolumeCommand();
+
+protected:
+    //! Returns uiValue incremented for given iIncr and overflows digit at uiOver.
+    uint32_t IncrementDigit(uint32_t uiValue, int32_t iIncr, uint32_t uiOver);
 
 protected:
     //! The only static singleton object.
