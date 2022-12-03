@@ -112,13 +112,21 @@ void Output::SetActiveMHz(uint32_t uiVal, bool b833)
 {
     if(DIGIT_COUNT >= 6)
     {
-        // TODO if(833)
-        m_auiDigitValues[5] = m_auiChars[uiVal % 10];
-        m_auiDigitValues[4] = m_auiChars[uiVal/10 % 10];
-        m_auiDigitValues[3] = m_auiChars[uiVal/100 % 10];
-        m_auiDigitValues[2] = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
-        m_auiDigitValues[1] = m_auiChars[uiVal/10000 % 10];
-        m_auiDigitValues[0] = m_auiChars[uiVal/100000 % 10];
+        if(b833) {
+            m_auiDigitValues[5] = m_auiChars[uiVal % 10];
+            m_auiDigitValues[4] = m_auiChars[uiVal/10 % 10];
+            m_auiDigitValues[3] = m_auiChars[uiVal/100 % 10];
+            m_auiDigitValues[2] = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
+            m_auiDigitValues[1] = m_auiChars[uiVal/10000 % 10];
+            m_auiDigitValues[0] = m_auiChars[uiVal/100000 % 10];
+        } else {
+            m_auiDigitValues[5] = m_auiChars[uiVal/10 % 10];
+            m_auiDigitValues[4] = m_auiChars[uiVal/100 % 10];
+            m_auiDigitValues[3] = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
+            m_auiDigitValues[2] = m_auiChars[uiVal/10000 % 10];
+            m_auiDigitValues[1] = m_auiChars[uiVal/100000 % 10];
+            m_auiDigitValues[0] = CH_SPACE;
+        }
     }
 }
 
@@ -128,13 +136,21 @@ void Output::SetStandbyMHz(uint32_t uiVal, bool b833)
 {
     if(DIGIT_COUNT >= 12)
     {
-        // TODO if(833)
-        m_auiDigitValues[11] = m_auiChars[uiVal % 10];
-        m_auiDigitValues[10] = m_auiChars[uiVal/10 % 10];
-        m_auiDigitValues[9]  = m_auiChars[uiVal/100 % 10];
-        m_auiDigitValues[8]  = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
-        m_auiDigitValues[7]  = m_auiChars[uiVal/10000 % 10];
-        m_auiDigitValues[6]  = m_auiChars[uiVal/100000 % 10];
+        if(b833) {
+            m_auiDigitValues[11] = m_auiChars[uiVal % 10];
+            m_auiDigitValues[10] = m_auiChars[uiVal/10 % 10];
+            m_auiDigitValues[9]  = m_auiChars[uiVal/100 % 10];
+            m_auiDigitValues[8]  = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
+            m_auiDigitValues[7]  = m_auiChars[uiVal/10000 % 10];
+            m_auiDigitValues[6]  = m_auiChars[uiVal/100000 % 10];
+        } else {
+            m_auiDigitValues[11] = CH_SPACE;
+            m_auiDigitValues[10] = m_auiChars[uiVal/10 % 10];
+            m_auiDigitValues[9] = m_auiChars[uiVal/100 % 10];
+            m_auiDigitValues[8] = m_auiChars[uiVal/1000 % 10] & DECIMAL_POINT;
+            m_auiDigitValues[7] = m_auiChars[uiVal/10000 % 10];
+            m_auiDigitValues[6] = m_auiChars[uiVal/100000 % 10];
+        }
     }
 }
 
