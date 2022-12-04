@@ -3,6 +3,7 @@
 
 #include <stdint.h>
 #include <stddef.h>
+#include <utility>
 #include "Model.h"
 #include "SettingsNavCom.h"
 
@@ -83,11 +84,20 @@ public:
     //! Returns current standby value on display
     uint8_t GetVolume() const;
 
-    //! Sets current standby value on display
+    //! Sets current volume value on display
     void SetVolume(int8_t iValue);
 
     //! Returns true if volume setting is in progress
     bool IsVolumeCommand();
+
+    //! Returns currently editing value firsta and last digit.
+    std::pair<int16_t, int16_t> GetEditingDigit() const;
+
+    //! Sets currently editing value first and last digit.
+    void SetEditingDigit(std::pair<int16_t, int16_t> interval);
+
+    //! Terminates value editing indication on display.
+    void SetEditingFinished();
 
 protected:
     //! Returns uiValue incremented for given iIncr and overflows digit at uiOver.
@@ -120,6 +130,12 @@ protected:
 
     //! Timestamp of last volume command
     uint32_t m_uiVolumeTimestamp = 0;
+
+    //! First and last digit of currently editing value
+    std::pair<int16_t, int16_t> m_pairEditingDigit = std::make_pair(1,0);
+
+    //! Timestamp of last value editing command
+    uint32_t m_uiValueEditTimestamp = 0;
 };
 
 #endif  // MODELNAVCOM_H

@@ -187,3 +187,30 @@ bool ModelNavCom::IsVolumeCommand()
 }
 
 //-----------------------------------------------------------------------------
+
+void ModelNavCom::SetEditingDigit(std::pair<int16_t, int16_t> interval)
+{
+    m_pairEditingDigit = interval;
+    m_uiValueEditTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+std::pair<int16_t, int16_t> ModelNavCom::GetEditingDigit() const
+{
+    // Return (1,0) = editing disabled after 3s of inactivity
+    if (helper::GetTimeDifference(m_uiValueEditTimestamp) > 2000) {
+        return std::make_pair(1,0);
+    } else {
+        return m_pairEditingDigit;
+    }
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetEditingFinished()
+{
+   m_pairEditingDigit = std::make_pair(1,0);
+}
+
+//-----------------------------------------------------------------------------

@@ -217,11 +217,14 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
                 }
             }
         }
+        // Switch between (9,11) and (6,8)
+        m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
     {
         // This is just for display. No action is performed on simulator.
         m_pModel->SetVolume(m_pModel->GetVolume()+iDirection*5);
+        m_pModel->SetEditingDigit(std::make_pair(9,11));
     }
 }
 
@@ -256,6 +259,8 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
                 m_pModel->IncrStandbyValue(iDirection*50, 1000);
             }
         }
+        // Switch between (9,11) and (6,8)
+        m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
     {
@@ -270,6 +275,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
         } else {
             m_pModel->IncrStandbyValue(iDirection*100, 1000); // TODO
         }
+        m_pModel->SetEditingFinished();
     }
 }
 
@@ -331,10 +337,13 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
     case 0:
         if(eEvent == beReleased) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            // Switch between (9,11) and (6,8)
+            m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
         }
         break;
     case 2: // On/Off
         if(eEvent == beReleased && m_pModel) {
+            // TODO remove !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
             if(m_pModel->IsSimConnected()) {
                 // Does this work ???
                 //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
@@ -358,6 +367,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
                 m_pModel->SetStandbyValue(uiTmp);
                 //m_pModel->SaveSettings();
             }
+            m_pModel->SetEditingFinished();
         }
         break;
     case 4: // Set Emergency frequency
@@ -369,6 +379,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
             } else {
                 m_pModel->SetActiveValue(121500);
             }
+            m_pModel->SetEditingFinished();
         }
         break;
     default:
@@ -389,6 +400,8 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
     case 0:
         if(eEvent == beReleased) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            // Switch between (9,11) and (6,8)
+            m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
         }
         break;
     case 1:
@@ -406,6 +419,7 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
                 m_pModel->SetStandbyValue(uiTmp);
                 //m_pModel->SaveSettings();
             }
+            m_pModel->SetEditingFinished();
         }
         break;
     default:

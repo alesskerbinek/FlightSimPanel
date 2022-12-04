@@ -69,6 +69,9 @@ private:
     //! Selected digit counter
     int16_t m_iDigit = 0;
 
+    //! Editing value blinking indicator counter
+    int16_t m_iBlinkingCounter = 0;
+
     //! Current digit values buffer
     uint8_t m_auiDigitValues[DIGIT_COUNT];
 

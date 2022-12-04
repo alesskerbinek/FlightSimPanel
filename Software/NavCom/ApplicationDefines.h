@@ -66,6 +66,7 @@
 
 // NavCom 7-segment digit addresses
 #define DIG_X 4
+#define DIG_Y 12
 #define DIG_1 5
 #define DIG_2 6
 #define DIG_3 3

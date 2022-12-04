@@ -21,9 +21,28 @@ void Output::Initialize()
 
 void Output::Process()
 {
+    // Handle value editing blinking
+    bool bSkip = false;
+    if(m_iDigit >= m_pModel->GetEditingDigit().first &&
+       m_iDigit <= m_pModel->GetEditingDigit().second
+    ) {
+        // Turn digits off for 3ms every 30ms.
+        if(m_iBlinkingCounter%30 < 3) {
+            bSkip = true;
+        }
+        // Increment counter only once between first and last digit
+        if(m_iDigit == m_pModel->GetEditingDigit().first) {
+            m_iBlinkingCounter++;
+        }
+    }
+
     //Select the digit and set value on the bus
     SelectDigit(m_auiDigitAddresses[m_iDigit]);
-    SetSegments(m_auiDigitValues[m_iDigit]);
+    if(bSkip) {
+        SetSegments(CH_SPACE);
+    } else {
+        SetSegments(m_auiDigitValues[m_iDigit]);
+    }
 
     // Go to next digit
     m_iDigit++;
