@@ -94,7 +94,10 @@ public:
     std::pair<int16_t, int16_t> GetEditingDigit() const;
 
     //! Sets currently editing value first and last digit.
-    void SetEditingDigit(std::pair<int16_t, int16_t> interval);
+    void SetEditingDigit(int16_t iSingleDigit);
+
+    //! Sets currently editing value first and last digit.
+    void SetEditingDigit(int16_t iStartDigit, int16_t iEndDigit);
 
     //! Terminates value editing indication on display.
     void SetEditingFinished();

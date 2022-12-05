@@ -218,13 +218,13 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
             }
         }
         // Switch between (9,11) and (6,8)
-        m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
+        m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
     {
         // This is just for display. No action is performed on simulator.
         m_pModel->SetVolume(m_pModel->GetVolume()+iDirection*5);
-        m_pModel->SetEditingDigit(std::make_pair(9,11));
+        m_pModel->SetEditingDigit(9,11);
     }
 }
 
@@ -260,7 +260,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
             }
         }
         // Switch between (9,11) and (6,8)
-        m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
+        m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
     {
@@ -291,18 +291,21 @@ void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_
             } else {
                 m_pModel->IncrStandbyValue(iDirection*100, 0);
             }
+            m_pModel->SetEditingDigit(6,7);
         } else if(m_uiDigitSelect == 1) { // Change 00X0
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
                 m_pModel->IncrStandbyValue(iDirection*10, 100);
             }
+            m_pModel->SetEditingDigit(8);
         } else { // Change 000X
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
                 m_pModel->IncrStandbyValue(iDirection, 10);
             }
+            m_pModel->SetEditingDigit(9);
         }
     }
 }
@@ -314,13 +317,33 @@ void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
     if(m_pModel)
     {
         if(m_uiDigitSelect == 0) { // Change X000
-            m_pModel->IncrActiveValue(iDirection*1000, 8000);
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrActiveValue(iDirection*1000, 8000);
+            }
+            m_pModel->SetEditingDigit(6);
         } else if(m_uiDigitSelect == 1) { // Change 0X00
-            m_pModel->IncrActiveValue(iDirection*100, 800);
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrActiveValue(iDirection*100, 800);
+            }
+            m_pModel->SetEditingDigit(7);
         } else if(m_uiDigitSelect == 2) { // Change 00X0
-            m_pModel->IncrActiveValue(iDirection*10, 80);
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrActiveValue(iDirection*10, 80);
+            }
+            m_pModel->SetEditingDigit(8);
         } else { // Change 000X
-            m_pModel->IncrActiveValue(iDirection, 8);
+            if(m_pModel->IsSimConnected()) {
+                // TODO
+            } else {
+                m_pModel->IncrActiveValue(iDirection, 8);
+            }
+            m_pModel->SetEditingDigit(9);
         }
     }
 }
@@ -338,7 +361,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
         if(eEvent == beReleased) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%2;
             // Switch between (9,11) and (6,8)
-            m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
+            m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
         }
         break;
     case 2: // On/Off
@@ -370,7 +393,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
             m_pModel->SetEditingFinished();
         }
         break;
-    case 4: // Set Emergency frequency
+    case 1: // Set Emergency frequency
         if(eEvent == beReleased && m_pModel) {
             if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
@@ -401,7 +424,7 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
         if(eEvent == beReleased) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%2;
             // Switch between (9,11) and (6,8)
-            m_pModel->SetEditingDigit(std::make_pair(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3));
+            m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
         }
         break;
     case 1:
@@ -431,10 +454,15 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
 
 void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents eEvent)
 {
+    bool bFinishEdit = true;
+
     switch (iButtonId) {
     case 0:
         if(eEvent == beReleased) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%3;
+            // Make pairs (6,7) (8,8) (9,9)
+            m_pModel->SetEditingDigit(m_uiDigitSelect==0 ? 6 : 7+m_uiDigitSelect, 7+m_uiDigitSelect);
+            bFinishEdit = false;
         }
         break;
     case 2:
@@ -467,16 +495,25 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
     default:
         break;
     }
+
+    // Finish value edit mode in case of any button is pressed except rotary knob.
+    if(bFinishEdit) {
+        m_pModel->SetEditingFinished();
+    }
 }
 
 // -------------------------------------------------------------------------
 
 void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
 {
+    bool bFinishEdit = true;
+
     switch (iButtonId) {
     case 0: // Go to next digit
         if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
             m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+            m_pModel->SetEditingDigit(6+m_uiDigitSelect);
+            bFinishEdit = false;
         }
         break;
     case 1: // Ident
@@ -515,6 +552,11 @@ void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
         break;
     default:
         break;
+    }
+
+    // Finish value edit mode in case of any button is pressed except rotary knob.
+    if(bFinishEdit) {
+        m_pModel->SetEditingFinished();
     }
 }
 

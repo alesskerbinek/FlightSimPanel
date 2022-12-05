@@ -188,9 +188,16 @@ bool ModelNavCom::IsVolumeCommand()
 
 //-----------------------------------------------------------------------------
 
-void ModelNavCom::SetEditingDigit(std::pair<int16_t, int16_t> interval)
+void ModelNavCom::SetEditingDigit(int16_t iSingleDigit)
 {
-    m_pairEditingDigit = interval;
+    SetEditingDigit(iSingleDigit, iSingleDigit);
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetEditingDigit(int16_t iStartDigit, int16_t iEndDigit)
+{
+    m_pairEditingDigit = std::make_pair(iStartDigit, iEndDigit);
     m_uiValueEditTimestamp = helper::GetTime();
 }
 
