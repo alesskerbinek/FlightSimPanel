@@ -39,12 +39,12 @@ public:
     }
 
     //! Returns current transponder mode
-    XpndrModes GetXpndrMode() const
-    {   return m_eXpndrMode; }
+    UnitModes GetUnitMode() const
+    {   return m_eUnitMode; }
 
     //! Sets current transponder mode
-    void SetXpndrMode(XpndrModes eMode)
-    {   m_eXpndrMode = eMode; }
+    void SetUnitMode(UnitModes eMode)
+    {   m_eUnitMode = eMode; }
 
     //! Sets transponder ident
     void SetXpndrIdent();
@@ -90,7 +90,10 @@ public:
     //! Returns true if volume setting is in progress
     bool IsVolumeCommand();
 
-    //! Returns currently editing value firsta and last digit.
+    //! Returns true if value editing currently in progress.
+    bool IsEditingDigit() const;
+
+    //! Returns currently editing value first and last digit.
     std::pair<int16_t, int16_t> GetEditingDigit() const;
 
     //! Sets currently editing value first and last digit.
@@ -101,6 +104,15 @@ public:
 
     //! Terminates value editing indication on display.
     void SetEditingFinished();
+
+    //! Reseturns flight time timer value in seconds.
+    uint32_t GetFlightTime();
+
+    //! Reseturns elapsed time timer value in seconds.
+    uint32_t GetElapsedTime();
+
+    //! Resets eleapsed time timer.
+    void ResetET();
 
 protected:
     //! Returns uiValue incremented for given iIncr and overflows digit at uiOver.
@@ -120,7 +132,7 @@ protected:
     uint32_t m_uiMinActive = 0;
 
     //! Current transponder mode
-    XpndrModes m_eXpndrMode = xmOff;
+    UnitModes m_eUnitMode = gmOff;
 
     //! Timestamp of last ident command
     uint32_t m_uiXpndrIdentTimestamp = 0;
@@ -139,6 +151,9 @@ protected:
 
     //! Timestamp of last value editing command
     uint32_t m_uiValueEditTimestamp = 0;
+
+    //! Timestamp of last Elapsed timer reset
+    uint32_t m_uiETResetTimestamp = 0;
 };
 
 #endif  // MODELNAVCOM_H

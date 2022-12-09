@@ -187,7 +187,11 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
 {
     if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
-        if(m_uiDigitSelect == 1) {
+        // Select first digit if not in edit mode already
+        if(m_pModel->IsEditingDigit() == false) {
+            m_uiDigitSelect = 0;
+        }
+        if(m_uiDigitSelect == 0) {
             if(m_pModel->IsSimConnected()) {
                 xplane::Commands cmd;
                 if(iComId == 1) {
@@ -218,7 +222,7 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
             }
         }
         // Switch between (9,11) and (6,8)
-        m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
+        m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
     {
@@ -234,7 +238,11 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
 {
     if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
     {
-        if(m_uiDigitSelect == 1) {
+        // Select first digit if not in edit mode already
+        if(m_pModel->IsEditingDigit() == false) {
+            m_uiDigitSelect = 0;
+        }
+        if(m_uiDigitSelect == 0) {
             if(m_pModel->IsSimConnected()) {
                 xplane::Commands cmd;
                 if(iVorId == 1) {
@@ -260,7 +268,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
             }
         }
         // Switch between (9,11) and (6,8)
-        m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
+        m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
     }
     else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
     {
@@ -285,27 +293,46 @@ void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_
 {
     if(m_pModel)
     {
+        // Select first digit if not in edit mode already
+        if(m_pModel->IsEditingDigit() == false) {
+            m_uiDigitSelect = 0;
+        }
         if(m_uiDigitSelect == 0) { // Change XX00
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection*100, 0);
+                if(m_pModel->GetUnitMode() == amFrq) {
+                    m_pModel->IncrStandbyValue(iDirection*100, 0);
+                    m_pModel->SetEditingDigit(6,7);
+                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                    m_pModel->IncrActiveValue(iDirection*100, 0);
+                    m_pModel->SetEditingDigit(0,1);
+                }
             }
-            m_pModel->SetEditingDigit(6,7);
         } else if(m_uiDigitSelect == 1) { // Change 00X0
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection*10, 100);
+                if(m_pModel->GetUnitMode() == amFrq) {
+                    m_pModel->IncrStandbyValue(iDirection*10, 100);
+                    m_pModel->SetEditingDigit(8);
+                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                    m_pModel->IncrActiveValue(iDirection*10, 100);
+                    m_pModel->SetEditingDigit(2);
+                }
             }
-            m_pModel->SetEditingDigit(8);
         } else { // Change 000X
             if(m_pModel->IsSimConnected()) {
                 // TODO
             } else {
-                m_pModel->IncrStandbyValue(iDirection, 10);
+                if(m_pModel->GetUnitMode() == amFrq) {
+                    m_pModel->IncrStandbyValue(iDirection, 10);
+                    m_pModel->SetEditingDigit(9);
+                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                    m_pModel->IncrActiveValue(iDirection, 10);
+                    m_pModel->SetEditingDigit(3);
+                }
             }
-            m_pModel->SetEditingDigit(9);
         }
     }
 }
@@ -316,6 +343,10 @@ void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
 {
     if(m_pModel)
     {
+        // Select first digit if not in edit mode already
+        if(m_pModel->IsEditingDigit() == false) {
+            m_uiDigitSelect = 0;
+        }
         if(m_uiDigitSelect == 0) { // Change X000
             if(m_pModel->IsSimConnected()) {
                 // TODO
@@ -359,9 +390,13 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
     switch (iButtonId) {
     case 0:
         if(eEvent == beReleased) {
-            m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            if(m_pModel->IsEditingDigit() == true) {
+                m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            } else {
+                m_uiDigitSelect = 0;
+            }
             // Switch between (9,11) and (6,8)
-            m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
+            m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
         }
         break;
     case 2: // On/Off
@@ -422,9 +457,13 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
     switch (iButtonId) {
     case 0:
         if(eEvent == beReleased) {
-            m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            if(m_pModel->IsEditingDigit() == true) {
+                m_uiDigitSelect = (m_uiDigitSelect+1)%2;
+            } else {
+                m_uiDigitSelect = 0;
+            }
             // Switch between (9,11) and (6,8)
-            m_pModel->SetEditingDigit(9-m_uiDigitSelect*3,11-m_uiDigitSelect*3);
+            m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
         }
         break;
     case 1:
@@ -459,30 +498,54 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
     switch (iButtonId) {
     case 0:
         if(eEvent == beReleased) {
-            m_uiDigitSelect = (m_uiDigitSelect+1)%3;
-            // Make pairs (6,7) (8,8) (9,9)
-            m_pModel->SetEditingDigit(m_uiDigitSelect==0 ? 6 : 7+m_uiDigitSelect, 7+m_uiDigitSelect);
-            bFinishEdit = false;
+            if(m_pModel->IsEditingDigit() == true) {
+                m_uiDigitSelect = (m_uiDigitSelect+1)%3;
+            } else {
+                m_uiDigitSelect = 0;
+            }
+            if(m_pModel->GetUnitMode() == amFrq) {
+                // Make pairs (6,7) (8,8) (9,9)
+                m_pModel->SetEditingDigit(m_uiDigitSelect==0 ? 6 : 7+m_uiDigitSelect, 7+m_uiDigitSelect);
+            } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                // Make pairs (0,1) (2,2) (3,3)
+                m_pModel->SetEditingDigit(m_uiDigitSelect==0 ? 0 : 1+m_uiDigitSelect, 1+m_uiDigitSelect);
+            }
+        }
+        bFinishEdit = false;
+        break;
+    case 2: // SET/RST
+        // KR 87 Manual: pressing the SET/RST button will reset the elapsed timer whether it is being
+        // displayed or not.
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->ResetET();
         }
         break;
-    case 2:
-        // TODO SET/RST
-        break;
-    case 3:
-        // TODO FT/ET
+    case 3: // FT/ET
+        if(eEvent == beReleased && m_pModel) {
+            if(m_pModel->GetUnitMode() == amFlT) {
+                m_pModel->SetUnitMode(amElT);
+            } else {
+                m_pModel->SetUnitMode(amFlT);
+            }
+        }
         break;
     case 4:
         // TODO <->/FREQ
         if(eEvent == beReleased && m_pModel) {
-            if(m_pModel->IsSimConnected()) {
-                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
-                            iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
-                m_uiDigitSelect = 0;
+            if(m_pModel->GetUnitMode() == amFrq) {
+                // Switch frequencies
+                if(m_pModel->IsSimConnected()) {
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                                iAdfId == 1 ? xplane::Commands::cmAdf1Flip : xplane::Commands::cmAdf2Flip));
+                    m_uiDigitSelect = 0;
+                } else {
+                    uint32_t uiTmp = m_pModel->GetActiveValue();
+                    m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
+                    m_pModel->SetStandbyValue(uiTmp);
+                    //m_pModel->SaveSettings();
+                }
             } else {
-                uint32_t uiTmp = m_pModel->GetActiveValue();
-                m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
-                m_pModel->SetStandbyValue(uiTmp);
-                //m_pModel->SaveSettings();
+                m_pModel->SetUnitMode(amFrq);
             }
         }
         break;
@@ -510,43 +573,47 @@ void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
 
     switch (iButtonId) {
     case 0: // Go to next digit
-        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
-            m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
+            if(m_pModel->IsEditingDigit() == true) {
+                m_uiDigitSelect = (m_uiDigitSelect+1)%4;
+            } else {
+                m_uiDigitSelect = 0;
+            }
             m_pModel->SetEditingDigit(6+m_uiDigitSelect);
-            bFinishEdit = false;
         }
+        bFinishEdit = false;
         break;
-    case 1: // Ident
-        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
-            m_pModel->SetXpndrIdent();
-        }
-        break;
-    case 2: // ALT
-        if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetXpndrMode(xmAlt);
-        }
-        break;
-    case 3:// ON
-        if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetXpndrMode(xmOn);
-        }
-        break;
-    case 4: // SBY
-        if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetXpndrMode(xmSby);
-        }
-        break;
-    case 5: // OFF
+    case 1: // OFF
         if(eEvent == bePressed && m_pModel) {
             m_pModel->SetXpndrShutdown(true);
         } else if(eEvent == beReleased && m_pModel) {
             m_pModel->SetXpndrShutdown(false);
         } else if(eEvent == beLongPress && m_pModel) {
-            m_pModel->SetXpndrMode(xmOff);
+            m_pModel->SetUnitMode(gmOff);
+        }
+        break;
+    case 2: // ALT
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetUnitMode(xmAlt);
+        }
+        break;
+    case 3:// ON
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetUnitMode(xmOn);
+        }
+        break;
+    case 4: // SBY
+        if(eEvent == beReleased && m_pModel) {
+            m_pModel->SetUnitMode(xmSby);
+        }
+        break;
+    case 5: // Ident
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
+            m_pModel->SetXpndrIdent();
         }
         break;
     case 6: // VFR (Set squawk 2000)
-        if(eEvent == beReleased && m_pModel && m_pModel->GetXpndrMode() != xmOff) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             m_pModel->SetActiveValue(2000);
         }
         break;

@@ -147,14 +147,20 @@ typedef  enum {
     utXPNDR
 } UnitTypes;
 
-//! Transponder modes
+//! Unit modes
 typedef  enum {
     xmUndefined = 0,
-    xmOff,
+    // General
+    gmOff,
+    // XPNDR
     xmSby,
     xmOn,
-    xmAlt
-} XpndrModes;
+    xmAlt,
+    // ADF
+    amFrq,
+    amFlT,
+    amElT,
+} UnitModes;
 
 // --------------------------------------------------------------------------
 

@@ -15,6 +15,21 @@ Output::Output()
 void Output::Initialize()
 {
     m_pModel = ModelNavCom::GetInstance();
+
+    if(m_pModel->GetSettings()) {
+        switch (m_pModel->GetSettings()->GetUnitType()) {
+        case utADF1:
+        case utADF2:
+//            m_auiDigitAddresses[3] = DIG_X;
+//            m_auiDigitAddresses[9] = DIG_Y;
+            break;
+        case utXPNDR:
+            m_auiDigitAddresses[9] = DIG_Y;
+            break;
+        default:
+            break;
+        }
+    }
 }
 
 // -------------------------------------------------------------------------
@@ -101,19 +116,28 @@ void Output::UpdateValues()
         case utADF1:
         case utADF2:
             SetActiveKHz(m_pModel->GetActiveValue());
-            SetStandbyKHz(m_pModel->GetStandbyValue());
-            // TODO or SetTime(m_pModel->GetFlightTime());
-            // TODO or SetTime(m_pModel->GetElapsedTime());
+            switch (m_pModel->GetUnitMode()) {
+            case amFlT:
+                SetTime(m_pModel->GetFlightTime());
+                break;
+            case amElT:
+                SetTime(m_pModel->GetElapsedTime());
+                break;
+            case amFrq:
+            default:
+                SetStandbyKHz(m_pModel->GetStandbyValue());
+                break;
+            }
             break;
         case utXPNDR:
-            if(m_pModel->GetXpndrMode() != xmOff) {
+            if(m_pModel->GetUnitMode() != gmOff) {
                 SetSquawk(m_pModel->GetActiveValue());
                 if(m_pModel->IsXpndrIdent()) {
                     SetIdent();
                 } else if(m_pModel->IsXpndrShutdown()) {
                     SetShutdown();
                 } else {
-                    SetMode(m_pModel->GetXpndrMode());
+                    SetMode(m_pModel->GetUnitMode());
                 }
             } else {
                 SetDisplayOff();
@@ -214,7 +238,7 @@ void Output::SetSquawk(uint32_t uiVal)
 
 // -------------------------------------------------------------------------
 
-void Output::SetMode(XpndrModes eMode)
+void Output::SetMode(UnitModes eMode)
 {
     if(DIGIT_COUNT >= 3)
     {
@@ -292,6 +316,22 @@ void Output::SetVolume(uint8_t uiVol)
         m_auiDigitValues[8]  = CH_L;
         m_auiDigitValues[7]  = CH_O;
         m_auiDigitValues[6]  = CH_V;
+    }
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetTime(uint32_t uiSecs)
+{
+    if(DIGIT_COUNT >= 10)
+    {
+        uint8_t uiMins = uiSecs/60;
+        uiSecs = uiSecs%60;
+
+        m_auiDigitValues[9]  = m_auiChars[uiSecs % 10];
+        m_auiDigitValues[8]  = m_auiChars[uiSecs/10 % 10];
+        m_auiDigitValues[7]  = m_auiChars[uiMins % 10] & DECIMAL_POINT;
+        m_auiDigitValues[6]  = m_auiChars[uiMins/10 % 10];
     }
 }
 

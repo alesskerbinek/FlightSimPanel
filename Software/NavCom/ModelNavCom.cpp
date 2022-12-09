@@ -188,6 +188,13 @@ bool ModelNavCom::IsVolumeCommand()
 
 //-----------------------------------------------------------------------------
 
+bool ModelNavCom:: IsEditingDigit() const
+{
+    return GetEditingDigit().first <= GetEditingDigit().second;
+}
+
+//-----------------------------------------------------------------------------
+
 void ModelNavCom::SetEditingDigit(int16_t iSingleDigit)
 {
     SetEditingDigit(iSingleDigit, iSingleDigit);
@@ -218,6 +225,27 @@ std::pair<int16_t, int16_t> ModelNavCom::GetEditingDigit() const
 void ModelNavCom::SetEditingFinished()
 {
    m_pairEditingDigit = std::make_pair(1,0);
+}
+
+//-----------------------------------------------------------------------------
+
+uint32_t ModelNavCom::GetFlightTime()
+{
+    return helper::GetTime()/1000;
+}
+
+//-----------------------------------------------------------------------------
+
+uint32_t ModelNavCom::GetElapsedTime()
+{
+    return helper::GetTimeDifference(m_uiETResetTimestamp)/1000;
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::ResetET()
+{
+    m_uiETResetTimestamp = helper::GetTime();
 }
 
 //-----------------------------------------------------------------------------

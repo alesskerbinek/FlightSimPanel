@@ -48,7 +48,7 @@ private:
     void SetSquawk(uint32_t uiVal);
 
     //! Sets transponder mode
-    void SetMode(XpndrModes eMode);
+    void SetMode(UnitModes eMode);
 
     //! Sets transponder ident indication
     void SetIdent();
@@ -61,6 +61,9 @@ private:
 
     //! Sets unit volume value
     void SetVolume(uint8_t uiVol);
+
+    //! Sets time in format "mm:ss"
+    void SetTime(uint32_t uiSecs);
 
 private:
     //! Model pointer;
