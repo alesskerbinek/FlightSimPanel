@@ -1,3 +1,5 @@
 In this directory we find files related to firmware development.
 
-There is separate subdirectory for each unit type. Files that are not in subdirectories are related to multiple unit types.
+Source code files for individual projects (unit tapes) are located in separate subdirectories. Source code files athat are common to multiple pprojects are located in subdirectory libraries/Common. At the moment no third party libraries are used. In case they they were, they would be located in libraries/ subdir as well.
+
+Other files, that are not source code and are related to multiple projects are located directly in this directory.
