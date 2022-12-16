@@ -101,32 +101,44 @@ void Output::UpdateValues()
         switch (m_pModel->GetUnitType()) {
         case utCom1:
         case utCom2:
-            SetActiveMHz(m_pModel->GetActiveValue(), true);
-            if(m_pModel->IsVolumeCommand()) {
-                SetVolume(m_pModel->GetVolume());
+            if(m_pModel->GetUnitMode() != gmOff) {
+                SetActiveMHz(m_pModel->GetActiveValue(), true);
+                if(m_pModel->IsVolumeCommand()) {
+                    SetVolume(m_pModel->GetVolume());
+                } else {
+                    SetStandbyMHz(m_pModel->GetStandbyValue(), true);
+                }
             } else {
-                SetStandbyMHz(m_pModel->GetStandbyValue(), true);
+                SetDisplayOff();
             }
             break;
         case utVOR1:
         case utVOR2:
-            SetActiveMHz(m_pModel->GetActiveValue(), false);
-            SetStandbyMHz(m_pModel->GetStandbyValue(), false);
+            if(m_pModel->GetUnitMode() != gmOff) {
+                SetActiveMHz(m_pModel->GetActiveValue(), false);
+                SetStandbyMHz(m_pModel->GetStandbyValue(), false);
+            } else {
+                SetDisplayOff();
+            }
             break;
         case utADF1:
         case utADF2:
-            SetActiveKHz(m_pModel->GetActiveValue());
-            switch (m_pModel->GetUnitMode()) {
-            case amFlT:
-                SetTime(m_pModel->GetFlightTime());
-                break;
-            case amElT:
-                SetTime(m_pModel->GetElapsedTime());
-                break;
-            case amFrq:
-            default:
-                SetStandbyKHz(m_pModel->GetStandbyValue());
-                break;
+            if(m_pModel->GetUnitMode() != gmOff) {
+                SetActiveKHz(m_pModel->GetActiveValue());
+                switch (m_pModel->GetUnitMode()) {
+                case amFlT:
+                    SetTime(m_pModel->GetFlightTime());
+                    break;
+                case amElT:
+                    SetTime(m_pModel->GetElapsedTime());
+                    break;
+                case amFrq:
+                default:
+                    SetStandbyKHz(m_pModel->GetStandbyValue());
+                    break;
+                }
+            } else {
+                SetDisplayOff();
             }
             break;
         case utXPNDR:
@@ -248,7 +260,7 @@ void Output::SetMode(UnitModes eMode)
             m_auiDigitValues[1] = CH_B;
             m_auiDigitValues[2] = CH_Y;
             break;
-        case xmOn:
+        case gmOn:
             m_auiDigitValues[0] = CH_O;
             m_auiDigitValues[1] = CH_N;
             m_auiDigitValues[2] = CH_SPACE;

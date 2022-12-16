@@ -114,6 +114,9 @@ public:
     //! Resets eleapsed time timer.
     void ResetET();
 
+    //! Resets flight time timer.
+    void ResetFT();
+
 protected:
     //! Returns uiValue incremented for given iIncr and overflows digit at uiOver.
     uint32_t IncrementDigit(uint32_t uiValue, int32_t iIncr, uint32_t uiOver);
@@ -132,7 +135,7 @@ protected:
     uint32_t m_uiMinActive = 0;
 
     //! Current transponder mode
-    UnitModes m_eUnitMode = gmOff;
+    UnitModes m_eUnitMode = xmUndefined;
 
     //! Timestamp of last ident command
     uint32_t m_uiXpndrIdentTimestamp = 0;
@@ -154,6 +157,9 @@ protected:
 
     //! Timestamp of last Elapsed timer reset
     uint32_t m_uiETResetTimestamp = 0;
+
+    //! Timestamp of last Flight timer reset
+    uint32_t m_uiFTResetTimestamp = 0;
 };
 
 #endif  // MODELNAVCOM_H

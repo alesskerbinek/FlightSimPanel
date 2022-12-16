@@ -31,25 +31,30 @@ void ModelNavCom::Initialize()
         case utUndefined:
             m_uiMinActive = 94000;
             m_uiMaxActive = 107900;
+            m_eUnitMode = gmOn;
             break;
         case utCom1:
         case utCom2:
             m_uiMinActive = 118000;
             m_uiMaxActive = 136990;
+            m_eUnitMode = gmOn;
             break;
         case utVOR1:
         case utVOR2:
             m_uiMinActive = 108000;
             m_uiMaxActive = 117950;
+            m_eUnitMode = gmOn;
             break;
         case utADF1:
         case utADF2:
             m_uiMinActive = 190;
             m_uiMaxActive = 1750;
+            m_eUnitMode = amFrq;
             break;
         case utXPNDR:
             m_uiMinActive = 0;
             m_uiMaxActive = 7777;
+            m_eUnitMode = xmSby;
             break;
         default:
             break;
@@ -231,7 +236,7 @@ void ModelNavCom::SetEditingFinished()
 
 uint32_t ModelNavCom::GetFlightTime()
 {
-    return helper::GetTime()/1000;
+    return helper::GetTimeDifference(m_uiFTResetTimestamp)/1000;
 }
 
 //-----------------------------------------------------------------------------
@@ -246,6 +251,13 @@ uint32_t ModelNavCom::GetElapsedTime()
 void ModelNavCom::ResetET()
 {
     m_uiETResetTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::ResetFT()
+{
+    m_uiFTResetTimestamp = helper::GetTime();
 }
 
 //-----------------------------------------------------------------------------

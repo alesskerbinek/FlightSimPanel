@@ -185,7 +185,7 @@ void Input::HandleButtonEvent(int8_t iButtonId, ButtonEvents eEvent)
 
 void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iComId)
 {
-    if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
+    if(m_pModel && m_pModel->GetUnitMode() != gmOff && iRotaryId == 0) // Right rotary - Frequency
     {
         // Select first digit if not in edit mode already
         if(m_pModel->IsEditingDigit() == false) {
@@ -224,7 +224,7 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
         // Switch between (9,11) and (6,8)
         m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
     }
-    else if (m_pModel && iRotaryId == 1) // Left rotary - Volume
+    else if (m_pModel && m_pModel->GetUnitMode() != gmOff && iRotaryId == 1) // Left rotary - Volume
     {
         // This is just for display. No action is performed on simulator.
         m_pModel->SetVolume(m_pModel->GetVolume()+iDirection*5);
@@ -236,7 +236,7 @@ void Input::HandleRotaryScrollCOM(int8_t iRotaryId, int8_t iDirection, int8_t iC
 
 void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iVorId)
 {
-    if(m_pModel && iRotaryId == 0) // Right rotary - Frequency
+    if(m_pModel && m_pModel->GetUnitMode() != gmOff && iRotaryId == 0) // Right rotary - Frequency
     {
         // Select first digit if not in edit mode already
         if(m_pModel->IsEditingDigit() == false) {
@@ -270,7 +270,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
         // Switch between (9,11) and (6,8)
         m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
     }
-    else if (m_pModel && iRotaryId == 1) // Left rotary - OBS
+    else if (m_pModel && m_pModel->GetUnitMode() != gmOff && iRotaryId == 1) // Left rotary - OBS
     {
         if(m_pModel->IsSimConnected()) {
             xplane::Commands cmd;
@@ -281,7 +281,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
             }
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            m_pModel->IncrStandbyValue(iDirection*100, 1000); // TODO
+            // TODO
         }
         m_pModel->SetEditingFinished();
     }
@@ -291,7 +291,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
 
 void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_t iAdfId)
 {
-    if(m_pModel)
+    if(m_pModel && m_pModel->GetUnitMode() != gmOff)
     {
         // Select first digit if not in edit mode already
         if(m_pModel->IsEditingDigit() == false) {
@@ -341,7 +341,7 @@ void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_
 
 void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
 {
-    if(m_pModel)
+    if(m_pModel && m_pModel->GetUnitMode() != gmOff)
     {
         // Select first digit if not in edit mode already
         if(m_pModel->IsEditingDigit() == false) {
@@ -389,7 +389,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
 
     switch (iButtonId) {
     case 0:
-        if(eEvent == beReleased) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsEditingDigit() == true) {
                 m_uiDigitSelect = (m_uiDigitSelect+1)%2;
             } else {
@@ -397,24 +397,18 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
             }
             // Switch between (9,11) and (6,8)
             m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
-        }
-        break;
-    case 2: // On/Off
-        if(eEvent == beReleased && m_pModel) {
-            // TODO remove !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            if(m_pModel->IsSimConnected()) {
-                // Does this work ???
-                //m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmCom1Off));
-                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
-                        iComId == 1 ? xplane::DataRefs::drCom1Power : xplane::DataRefs::drCom1Power,
-                        (uint32_t)0)); // == Off
+        } // Turn device on/off
+        else if(eEvent == beLongPress && m_pModel) {
+            if(m_pModel->GetUnitMode() != gmOff) {
+                m_pModel->SetUnitMode(gmOff);
+                m_pModel->SaveSettings();
             } else {
-                // TODO
+                m_pModel->SetUnitMode(amFrq);
             }
         }
         break;
     case 3: // Flip
-        if(eEvent == beReleased && m_pModel) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
                             iComId == 1 ? xplane::Commands::cmCom1Flip : xplane::Commands::cmCom2Flip));
@@ -423,13 +417,12 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
                 uint32_t uiTmp = m_pModel->GetActiveValue();
                 m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
                 m_pModel->SetStandbyValue(uiTmp);
-                //m_pModel->SaveSettings();
             }
             m_pModel->SetEditingFinished();
         }
         break;
     case 1: // Set Emergency frequency
-        if(eEvent == beReleased && m_pModel) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1ActiveFreq : xplane::DataRefs::drCom2ActiveFreq,
@@ -449,14 +442,10 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
 
 void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents eEvent)
 {
-    Serial.print("BTN ID:");
-    Serial.print(iButtonId);
-    Serial.print("Event:");
-    Serial.println(int(eEvent));
-
     switch (iButtonId) {
     case 0:
-        if(eEvent == beReleased) {
+        // Select next digit
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsEditingDigit() == true) {
                 m_uiDigitSelect = (m_uiDigitSelect+1)%2;
             } else {
@@ -464,13 +453,23 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
             }
             // Switch between (9,11) and (6,8)
             m_pModel->SetEditingDigit(6+m_uiDigitSelect*3,8+m_uiDigitSelect*3);
+        } // Turn device on/off
+        else if(eEvent == beLongPress && m_pModel) {
+            if(m_pModel->GetUnitMode() != gmOff) {
+                m_pModel->SetUnitMode(gmOff);
+                m_pModel->SaveSettings();
+            } else {
+                m_pModel->SetUnitMode(amFrq);
+            }
         }
         break;
-    case 1:
-        // TODO Show OBS
+    case 1: // OBS/Bug
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
+            // TODO
+        }
         break;
-    case 3:
-        if(eEvent == beReleased && m_pModel) {
+    case 3: // Flip
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
                             iVorId == 1 ? xplane::Commands::cmNav1Flip : xplane::Commands::cmNav2Flip));
@@ -479,7 +478,6 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
                 uint32_t uiTmp = m_pModel->GetActiveValue();
                 m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
                 m_pModel->SetStandbyValue(uiTmp);
-                //m_pModel->SaveSettings();
             }
             m_pModel->SetEditingFinished();
         }
@@ -497,7 +495,7 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
 
     switch (iButtonId) {
     case 0:
-        if(eEvent == beReleased) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->IsEditingDigit() == true) {
                 m_uiDigitSelect = (m_uiDigitSelect+1)%3;
             } else {
@@ -510,18 +508,28 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
                 // Make pairs (0,1) (2,2) (3,3)
                 m_pModel->SetEditingDigit(m_uiDigitSelect==0 ? 0 : 1+m_uiDigitSelect, 1+m_uiDigitSelect);
             }
+        } else if(eEvent == beLongPress && m_pModel) {
+            if(m_pModel->GetUnitMode() != gmOff) {
+                m_pModel->SetUnitMode(gmOff);
+                m_pModel->SaveSettings();
+            } else {
+                m_pModel->SetUnitMode(amFrq);
+                // Reset timers on unit turn on
+                m_pModel->ResetET();
+                m_pModel->ResetFT();
+            }
         }
         bFinishEdit = false;
         break;
     case 2: // SET/RST
         // KR 87 Manual: pressing the SET/RST button will reset the elapsed timer whether it is being
         // displayed or not.
-        if(eEvent == beReleased && m_pModel) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             m_pModel->ResetET();
         }
         break;
     case 3: // FT/ET
-        if(eEvent == beReleased && m_pModel) {
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->GetUnitMode() == amFlT) {
                 m_pModel->SetUnitMode(amElT);
             } else {
@@ -530,8 +538,8 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
         }
         break;
     case 4:
-        // TODO <->/FREQ
-        if(eEvent == beReleased && m_pModel) {
+        // <->/FREQ
+        if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
             if(m_pModel->GetUnitMode() == amFrq) {
                 // Switch frequencies
                 if(m_pModel->IsSimConnected()) {
@@ -542,7 +550,6 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
                     uint32_t uiTmp = m_pModel->GetActiveValue();
                     m_pModel->SetActiveValue(m_pModel->GetStandbyValue());
                     m_pModel->SetStandbyValue(uiTmp);
-                    //m_pModel->SaveSettings();
                 }
             } else {
                 m_pModel->SetUnitMode(amFrq);
@@ -550,7 +557,7 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
         }
         break;
     case 5:
-        // TODO BFO ???
+        // TODO BFO
         break;
     case 6:
         // TODO ADF
@@ -590,6 +597,7 @@ void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
             m_pModel->SetXpndrShutdown(false);
         } else if(eEvent == beLongPress && m_pModel) {
             m_pModel->SetUnitMode(gmOff);
+            m_pModel->SaveSettings();
         }
         break;
     case 2: // ALT
@@ -599,7 +607,7 @@ void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
         break;
     case 3:// ON
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetUnitMode(xmOn);
+            m_pModel->SetUnitMode(gmOn);
         }
         break;
     case 4: // SBY

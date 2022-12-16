@@ -152,9 +152,9 @@ typedef  enum {
     xmUndefined = 0,
     // General
     gmOff,
+    gmOn,
     // XPNDR
     xmSby,
-    xmOn,
     xmAlt,
     // ADF
     amFrq,
