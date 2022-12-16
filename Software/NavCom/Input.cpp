@@ -248,7 +248,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
                 if(iVorId == 1) {
                     cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav1StandbyCoarseDown;
                 } else {
-                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyCoarseUp : xplane::Commands::cmNav2StandbyCoarseDown;
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav2StandbyCoarseUp : xplane::Commands::cmNav2StandbyCoarseDown;
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
@@ -260,7 +260,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
                 if(iVorId == 1) {
                     cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav1StandbyFineDown;
                 } else {
-                    cmd = iDirection > 0 ? xplane::Commands::cmNav1StandbyFineUp : xplane::Commands::cmNav2StandbyFineDown;
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav2StandbyFineUp : xplane::Commands::cmNav2StandbyFineDown;
                 }
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
@@ -277,7 +277,7 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
             if(iVorId == 1) {
                 cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav2ObsDown;
+                cmd = iDirection > 0 ? xplane::Commands::cmNav2ObsUp : xplane::Commands::cmNav2ObsDown;
             }
             m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
