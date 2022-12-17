@@ -143,9 +143,13 @@ void ModelNavCom::IncrStandbyValue(int32_t iIncrement, uint32_t uiOverflow)
 
 //-----------------------------------------------------------------------------
 
-void ModelNavCom::SetXpndrIdent()
+void ModelNavCom::SetXpndrIdent(bool bEnabled)
 {
-    m_uiXpndrIdentTimestamp = helper::GetTime();
+    if(bEnabled) {
+        m_uiXpndrIdentTimestamp = helper::GetTime();
+    } else {
+        m_uiXpndrIdentTimestamp = 0;
+    }
 }
 
 //-----------------------------------------------------------------------------

@@ -349,28 +349,36 @@ void Input::HandleRotaryScrollXPNDR(int8_t /*iRotaryId*/, int8_t iDirection)
         }
         if(m_uiDigitSelect == 0) { // Change X000
             if(m_pModel->IsSimConnected()) {
-                // TODO
+                xplane::Commands cmd;
+                cmd = iDirection > 0 ? xplane::Commands::cmXpdrX000Up : xplane::Commands::cmXpdrX000Down;
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
                 m_pModel->IncrActiveValue(iDirection*1000, 8000);
             }
             m_pModel->SetEditingDigit(6);
         } else if(m_uiDigitSelect == 1) { // Change 0X00
             if(m_pModel->IsSimConnected()) {
-                // TODO
+                xplane::Commands cmd;
+                cmd = iDirection > 0 ? xplane::Commands::cmXpdr0X00Up : xplane::Commands::cmXpdr0X00Down;
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
                 m_pModel->IncrActiveValue(iDirection*100, 800);
             }
             m_pModel->SetEditingDigit(7);
         } else if(m_uiDigitSelect == 2) { // Change 00X0
             if(m_pModel->IsSimConnected()) {
-                // TODO
+                xplane::Commands cmd;
+                cmd = iDirection > 0 ? xplane::Commands::cmXpdr00X0Up : xplane::Commands::cmXpdr00X0Down;
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
                 m_pModel->IncrActiveValue(iDirection*10, 80);
             }
             m_pModel->SetEditingDigit(8);
         } else { // Change 000X
             if(m_pModel->IsSimConnected()) {
-                // TODO
+                xplane::Commands cmd;
+                cmd = iDirection > 0 ? xplane::Commands::cmXpdr000XUp : xplane::Commands::cmXpdr000XDown;
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
             } else {
                 m_pModel->IncrActiveValue(iDirection, 8);
             }
@@ -426,7 +434,7 @@ void Input::HandleButtonEventCOM(int8_t iButtonId, int8_t iComId, ButtonEvents e
             if(m_pModel->IsSimConnected()) {
                 m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
                         iComId == 1 ? xplane::DataRefs::drCom1ActiveFreq : xplane::DataRefs::drCom2ActiveFreq,
-                        (uint32_t)0x47ed4e00)); // == 121.500
+                        (uint32_t)0x47ed4e00)); // == 121500.0f ==> 121.500
             } else {
                 m_pModel->SetActiveValue(121500);
             }
@@ -596,33 +604,59 @@ void Input::HandleButtonEventXPNDR(int8_t iButtonId, ButtonEvents eEvent)
         } else if(eEvent == beReleased && m_pModel) {
             m_pModel->SetXpndrShutdown(false);
         } else if(eEvent == beLongPress && m_pModel) {
-            m_pModel->SetUnitMode(gmOff);
-            m_pModel->SaveSettings();
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmXpdrOff));
+            } else {
+                m_pModel->SetUnitMode(gmOff);
+                m_pModel->SaveSettings();
+            }
         }
         break;
     case 2: // ALT
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetUnitMode(xmAlt);
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmXpdrAlt));
+            } else {
+                m_pModel->SetUnitMode(xmAlt);
+            }
         }
         break;
     case 3:// ON
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetUnitMode(gmOn);
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmXpdrOn));
+            } else {
+                m_pModel->SetUnitMode(gmOn);
+            }
         }
         break;
     case 4: // SBY
         if(eEvent == beReleased && m_pModel) {
-            m_pModel->SetUnitMode(xmSby);
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmXpdrSby));
+            } else {
+                m_pModel->SetUnitMode(xmSby);
+            }
         }
         break;
     case 5: // Ident
         if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
-            m_pModel->SetXpndrIdent();
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, xplane::Commands::cmXpdrIdent));
+            } else {
+                m_pModel->SetXpndrIdent(true);
+            }
         }
         break;
     case 6: // VFR (Set squawk 2000)
         if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
-            m_pModel->SetActiveValue(2000);
+            if(m_pModel->IsSimConnected()) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtDREF,
+                        xplane::DataRefs::drXpdrCode,
+                        (uint32_t)0x44fa0000)); // == 2000.0
+            } else {
+                m_pModel->SetActiveValue(2000);
+            }
         }
         break;
     default:

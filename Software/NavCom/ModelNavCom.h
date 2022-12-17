@@ -47,7 +47,7 @@ public:
     {   m_eUnitMode = eMode; }
 
     //! Sets transponder ident
-    void SetXpndrIdent();
+    void SetXpndrIdent(bool bEnabled);
 
     //! Returns true if transponder is emitting ident
     bool IsXpndrIdent();

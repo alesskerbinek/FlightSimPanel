@@ -64,6 +64,9 @@ void Network::ParseUDP(AsyncUDPPacket &packet)
             case xplane::idNavObs:
                 ParseOBS(&packet.data()[i]);
                 break;
+            case xplane::idXpndrStatus:
+                ParseXPDR(&packet.data()[i]);
+                break;
             default:
                 break;
             }
@@ -152,6 +155,8 @@ const char* Network::GetDataRefString(xplane::DataRefs dr)
         return "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833";   // OK
     case xplane::drCom1Power:
         return "sim/cockpit2/radios/actuators/com1_power";
+    case xplane::drXpdrCode:
+        return "sim/cockpit/radios/transponder_code";                           // OK
     default:
         return nullptr;
     }
@@ -232,6 +237,32 @@ const char* Network::GetCommandString(xplane::Commands cmd)
         return "sim/radios/obs2_up";
     case xplane::cmNav2ObsDown:
         return "sim/radios/obs2_down";
+    case xplane::cmXpdrX000Up:
+        return "sim/transponder/transponder_thousands_up";
+    case xplane::cmXpdrX000Down:
+        return "sim/transponder/transponder_thousands_down";
+    case xplane::cmXpdr0X00Up:
+        return "sim/transponder/transponder_hundreds_up";
+    case xplane::cmXpdr0X00Down:
+        return "sim/transponder/transponder_hundreds_down";
+    case xplane::cmXpdr00X0Up:
+        return "sim/transponder/transponder_tens_up";
+    case xplane::cmXpdr00X0Down:
+        return "sim/transponder/transponder_tens_down";
+    case xplane::cmXpdr000XUp:
+        return "sim/transponder/transponder_ones_up";
+    case xplane::cmXpdr000XDown:
+        return "sim/transponder/transponder_ones_down";
+    case xplane::cmXpdrIdent:
+        return "sim/transponder/transponder_ident";
+    case xplane::cmXpdrOff:
+        return "sim/transponder/transponder_off";
+    case xplane::cmXpdrSby:
+        return "sim/transponder/transponder_standby";
+    case xplane::cmXpdrOn:
+        return "sim/transponder/transponder_on";
+    case xplane::cmXpdrAlt:
+        return "sim/transponder/transponder_alt";
     case xplane::cmLandingGear:
         return "sim/flight_controls/landing_gear_down";
     case xplane::cmFlapsUp:

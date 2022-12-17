@@ -129,7 +129,7 @@ void NetworkNavCom::ParseNAV(uint8_t* pBuffer)
 // ----------------------------------------------------------------------------
 
 void NetworkNavCom::ParseOBS(uint8_t* pBuffer)
-{    
+{
     float fValue = 0.0f;
     if(m_pModel && m_pModel->GetUnitType() == utVOR1)
     {
@@ -140,6 +140,39 @@ void NetworkNavCom::ParseOBS(uint8_t* pBuffer)
     {
         memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));        // NAV 2 OBS
         m_pModel->GetSettings()->SetOBS(fValue);
+    }
+}
+
+// ----------------------------------------------------------------------------
+
+void NetworkNavCom::ParseXPDR(uint8_t* pBuffer)
+{
+    float fValue = 0.0f;
+    if(m_pModel && m_pModel->GetUnitType() == utXPNDR)
+    {
+        memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));         // XPDR mode
+        switch (static_cast<uint8_t>(fValue)) {
+        case xplane::xmOff:
+            m_pModel->SetUnitMode(UnitModes::gmOff);
+            break;
+        case xplane::xmSby:
+            m_pModel->SetUnitMode(UnitModes::xmSby);
+            break;
+        case xplane::xmOn:
+            m_pModel->SetUnitMode(UnitModes::gmOn);
+            break;
+        case xplane::xmAlt:
+            m_pModel->SetUnitMode(UnitModes::xmAlt);
+            break;
+        default:
+            break;
+        }
+
+        memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));        // Xpdr squawk
+        m_pModel->GetSettings()->SetActiveValue(fValue);
+
+        memcpy(&fValue, &(pBuffer[12]), sizeof(fValue));       // Xpdr ident
+        m_pModel->SetXpndrIdent(fValue > 0.1f);     // 0.0 = false, 1.0 = true
     }
 }
 

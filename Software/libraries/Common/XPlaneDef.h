@@ -57,6 +57,7 @@ enum DataRefs {
     drCom2ActiveFreq,
     drCom2StandbyFreq,
     drCom1Power,
+    drXpdrCode,
 };
 
 // --------------------------------------------------------------------
@@ -101,9 +102,34 @@ enum Commands {
     cmNav1ObsDown,
     cmNav2ObsUp,
     cmNav2ObsDown,
+    cmXpdrX000Up,
+    cmXpdrX000Down,
+    cmXpdr0X00Up,
+    cmXpdr0X00Down,
+    cmXpdr00X0Up,
+    cmXpdr00X0Down,
+    cmXpdr000XUp,
+    cmXpdr000XDown,
+    cmXpdrIdent,
+    cmXpdrOff,
+    cmXpdrSby,
+    cmXpdrOn,
+    cmXpdrAlt,
     cmLandingGear,
     cmFlapsUp,
     cmFlapsDown,
+};
+
+// --------------------------------------------------------------------
+
+/**
+ * @brief Transponder modes
+ */
+enum XpdrModes {
+    xmOff = 0,
+    xmSby,
+    xmOn,
+    xmAlt,
 };
 
 // --------------------------------------------------------------------

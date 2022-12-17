@@ -21,16 +21,19 @@ public:
 
 protected:
     //! Parses DREF message. Reimplement in inherited class.
-    virtual void ParseDREF(uint8_t* pBuffer);
+    virtual void ParseDREF(uint8_t* pBuffer) override;
 
     //! Parses COM1 & COM2 frequency DATA message.
-    virtual void ParseCOM(uint8_t* pBuffer);
+    virtual void ParseCOM(uint8_t* pBuffer) override;
 
     //! Parses NAV1 & NAV2 frequency DATA message.
-    virtual void ParseNAV(uint8_t* pBuffer);
+    virtual void ParseNAV(uint8_t* pBuffer) override;
 
     //! Parses NAV1 & NAV2 OBS DATA message.
-    virtual void ParseOBS(uint8_t* pBuffer);
+    virtual void ParseOBS(uint8_t* pBuffer) override;
+
+    //! Parses TRANSPONDER DATA message.
+    virtual void ParseXPDR(uint8_t* pBuffer) override;
 
     /**
      * @brief Function checks whether there are messages in Tx queue that need to be sent.
