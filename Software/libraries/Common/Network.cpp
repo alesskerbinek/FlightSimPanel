@@ -67,6 +67,9 @@ void Network::ParseUDP(AsyncUDPPacket &packet)
             case xplane::idXpndrStatus:
                 ParseXPDR(&packet.data()[i]);
                 break;
+            case xplane::idAdfStatus:
+                ParseADF(&packet.data()[i]);
+                break;
             default:
                 break;
             }
@@ -153,8 +156,14 @@ const char* Network::GetDataRefString(xplane::DataRefs dr)
         return "sim/cockpit2/radios/actuators/com2_frequency_hz_833";           // OK
     case xplane::drCom2StandbyFreq:
         return "sim/cockpit2/radios/actuators/com2_standby_frequency_hz_833";   // OK
-    case xplane::drCom1Power:
-        return "sim/cockpit2/radios/actuators/com1_power";
+    case xplane::drAdf1ActiveFreq:
+        return "sim/cockpit/radios/adf1_freq_hz";                               // OK
+    case xplane::drAdf1StandbyFreq:
+        return "sim/cockpit/radios/adf1_stdby_freq_hz";                         // OK
+    case xplane::drAdf2ActiveFreq:
+        return "sim/cockpit/radios/adf2_freq_hz";
+    case xplane::drAdf2StandbyFreq:
+        return "sim/cockpit/radios/adf2_stdby_freq_hz";
     case xplane::drXpdrCode:
         return "sim/cockpit/radios/transponder_code";                           // OK
     default:
@@ -238,31 +247,99 @@ const char* Network::GetCommandString(xplane::Commands cmd)
     case xplane::cmNav2ObsDown:
         return "sim/radios/obs2_down";
     case xplane::cmXpdrX000Up:
-        return "sim/transponder/transponder_thousands_up";
+        return "sim/transponder/transponder_thousands_up";      // OK
     case xplane::cmXpdrX000Down:
-        return "sim/transponder/transponder_thousands_down";
+        return "sim/transponder/transponder_thousands_down";    // OK
     case xplane::cmXpdr0X00Up:
-        return "sim/transponder/transponder_hundreds_up";
+        return "sim/transponder/transponder_hundreds_up";       // OK
     case xplane::cmXpdr0X00Down:
-        return "sim/transponder/transponder_hundreds_down";
+        return "sim/transponder/transponder_hundreds_down";     // OK
     case xplane::cmXpdr00X0Up:
-        return "sim/transponder/transponder_tens_up";
+        return "sim/transponder/transponder_tens_up";           // OK
     case xplane::cmXpdr00X0Down:
-        return "sim/transponder/transponder_tens_down";
+        return "sim/transponder/transponder_tens_down";         // OK
     case xplane::cmXpdr000XUp:
-        return "sim/transponder/transponder_ones_up";
+        return "sim/transponder/transponder_ones_up";           // OK
     case xplane::cmXpdr000XDown:
-        return "sim/transponder/transponder_ones_down";
+        return "sim/transponder/transponder_ones_down";         // OK
     case xplane::cmXpdrIdent:
-        return "sim/transponder/transponder_ident";
+        return "sim/transponder/transponder_ident";             // OK
     case xplane::cmXpdrOff:
-        return "sim/transponder/transponder_off";
+        return "sim/transponder/transponder_off";               // OK
     case xplane::cmXpdrSby:
-        return "sim/transponder/transponder_standby";
+        return "sim/transponder/transponder_standby";           // OK
     case xplane::cmXpdrOn:
-        return "sim/transponder/transponder_on";
+        return "sim/transponder/transponder_on";                // OK
     case xplane::cmXpdrAlt:
-        return "sim/transponder/transponder_alt";
+        return "sim/transponder/transponder_alt";               // OK
+    case xplane::cmAdf1ActiveXX00Up:
+        return "sim/radios/actv_adf1_hundreds_thous_up";        // OK
+    case xplane::cmAdf1ActiveXX00Down:
+        return "sim/radios/actv_adf1_hundreds_thous_down";      // OK
+    case xplane::cmAdf1Active00X0Up:
+        return "sim/radios/actv_adf1_tens_up";                  // OK
+    case xplane::cmAdf1Active00X0Down:
+        return "sim/radios/actv_adf1_tens_down";                // OK
+    case xplane::cmAdf1Active000XUp:
+        return "sim/radios/actv_adf1_ones_up";                  // OK
+    case xplane::cmAdf1Active000XDown:
+        return "sim/radios/actv_adf1_ones_down";                // OK
+    case xplane::cmAdf1StandbyXX00Up:
+        return "sim/radios/stby_adf1_hundreds_thous_up";        // OK
+    case xplane::cmAdf1StandbyXX00Down:
+        return "sim/radios/stby_adf1_hundreds_thous_down";      // OK
+    case xplane::cmAdf1Standby00X0Up:
+        return "sim/radios/stby_adf1_tens_up";                  // OK
+    case xplane::cmAdf1Standby00X0Down:
+        return "sim/radios/stby_adf1_tens_down";                // OK
+    case xplane::cmAdf1Standby000XUp:
+        return "sim/radios/stby_adf1_ones_up";                  // OK
+    case xplane::cmAdf1Standby000XDown:
+        return "sim/radios/stby_adf1_ones_down";                // OK
+    case xplane::cmAdf2ActiveXX00Up:
+        return "sim/radios/actv_adf2_hundreds_thous_up";
+    case xplane::cmAdf2ActiveXX00Down:
+        return "sim/radios/actv_adf2_hundreds_thous_down";
+    case xplane::cmAdf2Active00X0Up:
+        return "sim/radios/actv_adf2_tens_up";
+    case xplane::cmAdf2Active00X0Down:
+        return "sim/radios/actv_adf2_tens_down";
+    case xplane::cmAdf2Active000XUp:
+        return "sim/radios/actv_adf2_ones_up";
+    case xplane::cmAdf2Active000XDown:
+        return "sim/radios/actv_adf2_ones_down";
+    case xplane::cmAdf2StandbyXX00Up:
+        return "sim/radios/stby_adf2_hundreds_thous_up";
+    case xplane::cmAdf2StandbyXX00Down:
+        return "sim/radios/stby_adf2_hundreds_thous_down";
+    case xplane::cmAdf2Standby00X0Up:
+        return "sim/radios/stby_adf2_tens_up";
+    case xplane::cmAdf2Standby00X0Down:
+        return "sim/radios/stby_adf2_tens_down";
+    case xplane::cmAdf2Standby000XUp:
+        return "sim/radios/stby_adf2_ones_up";
+    case xplane::cmAdf2Standby000XDown:
+        return "sim/radios/stby_adf2_ones_down";
+    case xplane::cmAdf1PowerOff:
+        return "sim/radios/adf1_power_mode_0";          // OK
+    case xplane::cmAdf1PowerAnt:
+        return "sim/radios/adf1_power_mode_1";          // OK
+    case xplane::cmAdf1PowerOn:
+        return "sim/radios/adf1_power_mode_2";          // OK
+    case xplane::cmAdf1PowerTone:
+        return "sim/radios/adf1_power_mode_3";          // OK
+    case xplane::cmAdf1PowerTest:
+        return "sim/radios/adf1_power_mode_4";
+    case xplane::cmAdf2PowerOff:
+        return "sim/radios/adf2_power_mode_0";
+    case xplane::cmAdf2PowerAnt:
+        return "sim/radios/adf2_power_mode_1";
+    case xplane::cmAdf2PowerOn:
+        return "sim/radios/adf2_power_mode_2";
+    case xplane::cmAdf2PowerTone:
+        return "sim/radios/adf2_power_mode_3";
+    case xplane::cmAdf2PowerTest:
+        return "sim/radios/adf2_power_mode_4";
     case xplane::cmLandingGear:
         return "sim/flight_controls/landing_gear_down";
     case xplane::cmFlapsUp:

@@ -35,6 +35,9 @@ protected:
     //! Parses TRANSPONDER DATA message.
     virtual void ParseXPDR(uint8_t* pBuffer) override;
 
+    //! Parses ADF DATA message.
+    virtual void ParseADF(uint8_t* pBuffer) override;
+
     /**
      * @brief Function checks whether there are messages in Tx queue that need to be sent.
      * Sends the oldest datagram in the queue (FIFO).

@@ -83,6 +83,28 @@ void NetworkNavCom::ParseDREF(uint8_t* pBuffer)
             m_pModel->SetStandbyValue(fValue);
         }
     }
+    else if(m_pModel && m_pModel->GetUnitType() == utADF1)
+    {
+        if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drAdf1ActiveFreq), 31) == 0) { // TODO size??????
+            memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+            m_pModel->SetActiveValue(fValue);
+        }
+        else if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drAdf1StandbyFreq), 37) == 0) { // TODO size??????
+            memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+            m_pModel->SetStandbyValue(fValue);
+        }
+    }
+    else if(m_pModel && m_pModel->GetUnitType() == utADF2)
+    {
+        if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drAdf2ActiveFreq), 31) == 0) { // TODO size??????
+            memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+            m_pModel->SetActiveValue(fValue);
+        }
+        else if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drAdf2StandbyFreq), 37) == 0) { // TODO size??????
+            memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+            m_pModel->SetStandbyValue(fValue);
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------
@@ -90,19 +112,17 @@ void NetworkNavCom::ParseDREF(uint8_t* pBuffer)
 void NetworkNavCom::ParseCOM(uint8_t* pBuffer)
 {
     // DEPRECATED - we use DREF which supports 8.33 kHz
-    return;
-
-    float fValue = 0.0f;
-    if(m_pModel && m_pModel->GetUnitType() == utCom1)
-    {
-        memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));     // COM 1 Active Freq
-        memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));     // COM 1 Standby Freq
-    }
-    else if(m_pModel && m_pModel->GetUnitType() == utCom2)
-    {
-        memcpy(&fValue, &(pBuffer[16]), sizeof(fValue));     // COM 2 Active Freq
-        memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));     // COM 2 Standby Freq
-    }
+//    float fValue = 0.0f;
+//    if(m_pModel && m_pModel->GetUnitType() == utCom1)
+//    {
+//        memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));     // COM 1 Active Freq
+//        memcpy(&fValue, &(pBuffer[8]), sizeof(fValue));     // COM 1 Standby Freq
+//    }
+//    else if(m_pModel && m_pModel->GetUnitType() == utCom2)
+//    {
+//        memcpy(&fValue, &(pBuffer[16]), sizeof(fValue));     // COM 2 Active Freq
+//        memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));     // COM 2 Standby Freq
+//    }
 }
 
 // ----------------------------------------------------------------------------
@@ -174,6 +194,24 @@ void NetworkNavCom::ParseXPDR(uint8_t* pBuffer)
         memcpy(&fValue, &(pBuffer[12]), sizeof(fValue));       // Xpdr ident
         m_pModel->SetXpndrIdent(fValue > 0.1f);     // 0.0 = false, 1.0 = true
     }
+}
+
+// ----------------------------------------------------------------------------
+
+void NetworkNavCom::ParseADF(uint8_t* pBuffer)
+{
+    // DEPRECATED - we use DREF which supports active and standby freq
+//    float fValue = 0.0f;
+//    if(m_pModel && m_pModel->GetUnitType() == utADF1)
+//    {
+//        memcpy(&fValue, &(pBuffer[4]), sizeof(fValue));         // ADF 1 Freq
+//        m_pModel->GetSettings()->SetActiveValue(fValue);
+//    }
+//    else if(m_pModel && m_pModel->GetUnitType() == utADF2)
+//    {
+//        memcpy(&fValue, &(pBuffer[20]), sizeof(fValue));        // ADF 2 Freq
+//        m_pModel->GetSettings()->SetActiveValue(fValue);
+//    }
 }
 
 // ----------------------------------------------------------------------------

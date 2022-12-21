@@ -62,6 +62,9 @@ protected:
     //! Parses TRANSPONDER DATA message. Reimplement in inherited class.
     virtual void ParseXPDR(uint8_t* pBuffer) {}
 
+    //! Parses ADF DATA message. Reimplement in inherited class.
+    virtual void ParseADF(uint8_t* pBuffer) {}
+
     /**
     * @brief Returns text representation for given DataRef type.
     * @param dr DataRef type

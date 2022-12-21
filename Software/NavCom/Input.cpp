@@ -298,40 +298,88 @@ void Input::HandleRotaryScrollADF(int8_t /*iRotaryId*/, int8_t iDirection, int8_
             m_uiDigitSelect = 0;
         }
         if(m_uiDigitSelect == 0) { // Change XX00
-            if(m_pModel->IsSimConnected()) {
-                // TODO
-            } else {
-                if(m_pModel->GetUnitMode() == amFrq) {
+            if(m_pModel->GetUnitMode() == amFrq) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1StandbyXX00Up : xplane::Commands::cmAdf1StandbyXX00Down;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2StandbyXX00Up : xplane::Commands::cmAdf2StandbyXX00Down;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
                     m_pModel->IncrStandbyValue(iDirection*100, 0);
-                    m_pModel->SetEditingDigit(6,7);
-                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
-                    m_pModel->IncrActiveValue(iDirection*100, 0);
-                    m_pModel->SetEditingDigit(0,1);
                 }
+                m_pModel->SetEditingDigit(6,7);
+            } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1ActiveXX00Up : xplane::Commands::cmAdf1ActiveXX00Down;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2ActiveXX00Up : xplane::Commands::cmAdf2ActiveXX00Down;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
+                    m_pModel->IncrActiveValue(iDirection*100, 0);
+                }
+                m_pModel->SetEditingDigit(0,1);
             }
         } else if(m_uiDigitSelect == 1) { // Change 00X0
-            if(m_pModel->IsSimConnected()) {
-                // TODO
-            } else {
-                if(m_pModel->GetUnitMode() == amFrq) {
+            if(m_pModel->GetUnitMode() == amFrq) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1Standby00X0Up : xplane::Commands::cmAdf1Standby00X0Down;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2Standby00X0Up : xplane::Commands::cmAdf2Standby00X0Down;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
                     m_pModel->IncrStandbyValue(iDirection*10, 100);
-                    m_pModel->SetEditingDigit(8);
-                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
-                    m_pModel->IncrActiveValue(iDirection*10, 100);
-                    m_pModel->SetEditingDigit(2);
                 }
+                m_pModel->SetEditingDigit(8);
+            } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1Active00X0Up : xplane::Commands::cmAdf1Active00X0Down;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2Active00X0Up : xplane::Commands::cmAdf2Active00X0Down;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
+                    m_pModel->IncrActiveValue(iDirection*10, 100);
+                }
+                m_pModel->SetEditingDigit(2);
             }
         } else { // Change 000X
-            if(m_pModel->IsSimConnected()) {
-                // TODO
-            } else {
-                if(m_pModel->GetUnitMode() == amFrq) {
+            if(m_pModel->GetUnitMode() == amFrq) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1Standby000XUp : xplane::Commands::cmAdf1Standby000XDown;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2Standby000XUp : xplane::Commands::cmAdf2Standby000XDown;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
                     m_pModel->IncrStandbyValue(iDirection, 10);
-                    m_pModel->SetEditingDigit(9);
-                } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
-                    m_pModel->IncrActiveValue(iDirection, 10);
-                    m_pModel->SetEditingDigit(3);
                 }
+                m_pModel->SetEditingDigit(9);
+            } else if(m_pModel->GetUnitMode() == amElT || m_pModel->GetUnitMode() == amFlT) {
+                if(m_pModel->IsSimConnected()) {
+                    xplane::Commands cmd;
+                    if(iAdfId == 1) {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf1Active000XUp : xplane::Commands::cmAdf1Active000XDown;
+                    } else {
+                        cmd = iDirection > 0 ? xplane::Commands::cmAdf2Active000XUp : xplane::Commands::cmAdf2Active000XDown;
+                    }
+                    m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                } else {
+                    m_pModel->IncrActiveValue(iDirection, 10);
+                }
+                m_pModel->SetEditingDigit(3);
             }
         }
     }
@@ -565,10 +613,30 @@ void Input::HandleButtonEventADF(int8_t iButtonId, int8_t iAdfId, ButtonEvents e
         }
         break;
     case 5:
-        // TODO BFO
+        // BFO ON/OFF
+        if(m_pModel->IsSimConnected()) {
+            if(eEvent == beReleased && m_pModel) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iAdfId == 1 ? xplane::Commands::cmAdf1PowerOn : xplane::Commands::cmAdf2PowerOn));
+            } else if(eEvent == bePressed && m_pModel) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iAdfId == 1 ? xplane::Commands::cmAdf1PowerTone : xplane::Commands::cmAdf2PowerTone));
+            }
+        }
+        // Nothing to do in demo mode
         break;
     case 6:
-        // TODO ADF
+        // ADF/ANT
+        if(m_pModel->IsSimConnected()) {
+            if(eEvent == beReleased && m_pModel) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iAdfId == 1 ? xplane::Commands::cmAdf1PowerAnt : xplane::Commands::cmAdf2PowerAnt));
+            } else if(eEvent == bePressed && m_pModel) {
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND,
+                            iAdfId == 1 ? xplane::Commands::cmAdf1PowerOn : xplane::Commands::cmAdf2PowerOn));
+            }
+        }
+        // Nothing to do in demo mode
         break;
     default:
         break;
