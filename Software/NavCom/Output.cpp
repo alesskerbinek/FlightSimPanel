@@ -20,8 +20,8 @@ void Output::Initialize()
         switch (m_pModel->GetSettings()->GetUnitType()) {
         case utADF1:
         case utADF2:
-//            m_auiDigitAddresses[3] = DIG_X;
-//            m_auiDigitAddresses[9] = DIG_Y;
+            m_auiDigitAddresses[3] = DIG_X;
+            m_auiDigitAddresses[9] = DIG_Y;
             break;
         case utXPNDR:
             m_auiDigitAddresses[9] = DIG_Y;
