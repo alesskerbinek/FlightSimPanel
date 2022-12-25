@@ -81,7 +81,7 @@ public:
     UnitTypes GetUnitType()
     {   return m_pSetNavCom ? m_pSetNavCom->GetUnitType() : utUndefined; }
 
-    //! Returns current standby value on display
+    //! Returns current volume value on display
     uint8_t GetVolume() const;
 
     //! Sets current volume value on display
@@ -89,6 +89,30 @@ public:
 
     //! Returns true if volume setting is in progress
     bool IsVolumeCommand();
+
+    //! Returns current OBS value on display
+    uint16_t GetOBS() const;
+
+    //! Sets current OBS value on display
+    void SetOBS(int16_t iValue);
+
+    //! Returns true if OBS setting is in progress
+    bool IsOBSCommand();
+
+    //! Finishes OBS editing on display
+    void SetOBSFinished();
+
+    //! Returns current heading bug value on display
+    uint16_t GetHDG() const;
+
+    //! Sets current heading bug value on display
+    void SetHDG(int16_t iValue);
+
+    //! Returns true if heading bug setting is in progress
+    bool IsHDGCommand();
+
+    //! Finishes heading bug editing on display
+    void SetHDGFinished();
 
     //! Returns true if value editing currently in progress.
     bool IsEditingDigit() const;
@@ -148,6 +172,12 @@ protected:
 
     //! Timestamp of last volume command
     uint32_t m_uiVolumeTimestamp = 0;
+
+    //! Timestamp of last OBS command
+    uint32_t m_uiOBSTimestamp = 0;
+
+    //! Timestamp of last HDG bug command
+    uint32_t m_uiHDGTimestamp = 0;
 
     //! First and last digit of currently editing value
     std::pair<int16_t, int16_t> m_pairEditingDigit = std::make_pair(1,0);

@@ -272,18 +272,30 @@ void Input::HandleRotaryScrollVOR(int8_t iRotaryId, int8_t iDirection, int8_t iV
     }
     else if (m_pModel && m_pModel->GetUnitMode() != gmOff && iRotaryId == 1) // Left rotary - OBS
     {
-        if(m_pModel->IsSimConnected()) {
-            xplane::Commands cmd;
-            if(iVorId == 1) {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
+        if(m_pModel->IsHDGCommand()) {
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                cmd = iDirection > 0 ? xplane::Commands::cmAutopilotHdgUp : xplane::Commands::cmAutopilotHdgDown;
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                m_pModel->SetHDG(m_pModel->GetHDG()); // just set the same value to reset the timer
             } else {
-                cmd = iDirection > 0 ? xplane::Commands::cmNav2ObsUp : xplane::Commands::cmNav2ObsDown;
+                m_pModel->SetHDG(m_pModel->GetHDG()+iDirection);
             }
-            m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
         } else {
-            // TODO
+            if(m_pModel->IsSimConnected()) {
+                xplane::Commands cmd;
+                if(iVorId == 1) {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav1ObsUp : xplane::Commands::cmNav1ObsDown;
+                } else {
+                    cmd = iDirection > 0 ? xplane::Commands::cmNav2ObsUp : xplane::Commands::cmNav2ObsDown;
+                }
+                m_pModel->AddToTxQueue(xplane::UdpDatagram(xplane::UdpDataType::dtCMND, cmd));
+                m_pModel->SetOBS(m_pModel->GetOBS()); // just set the same value to reset the timer
+            } else {
+                m_pModel->SetOBS(m_pModel->GetOBS()+iDirection);
+            }
         }
-        m_pModel->SetEditingFinished();
+        m_pModel->SetEditingDigit(9,11);
     }
 }
 
@@ -521,7 +533,17 @@ void Input::HandleButtonEventVOR(int8_t iButtonId, int8_t iVorId, ButtonEvents e
         break;
     case 1: // OBS/Bug
         if(eEvent == beReleased && m_pModel && m_pModel->GetUnitMode() != gmOff) {
-            // TODO
+            if(m_pModel->IsHDGCommand()) {
+                m_pModel->SetHDGFinished();
+                m_pModel->SetEditingFinished();
+            } else if(m_pModel->IsOBSCommand()) {
+                m_pModel->SetOBSFinished();
+                m_pModel->SetHDG(m_pModel->GetHDG()); // just set the same value to reset the timer
+                m_pModel->SetEditingDigit(9,11);
+            } else {
+                m_pModel->SetOBS(m_pModel->GetOBS()); // just set the same value to reset the timer
+                m_pModel->SetEditingDigit(9,11);
+            }
         }
         break;
     case 3: // Flip

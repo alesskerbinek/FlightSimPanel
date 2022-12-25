@@ -103,6 +103,7 @@
 #define CH_E 0x86
 #define CH_F 0x8E
 #define CH_G 0x82
+#define CH_H 0x89
 #define CH_I 0xF9
 #define CH_L 0xC7
 #define CH_N 0xAB
@@ -132,7 +133,8 @@ typedef  struct {
     uint16_t uiUdpRemotePort;   // 2 bytes
     uint32_t uiUdpRemoteIP;     // 4 bytes
     uint16_t uiOBS;             // 2 bytes
-    uint8_t  auiFree[166];      // FREE SPACE (sum of structure = 256 bytes)
+    uint16_t uiHDG;             // 2 bytes
+    uint8_t  auiFree[164];      // FREE SPACE (sum of structure = 256 bytes)
 } settings_t;
 
 //! Unit types

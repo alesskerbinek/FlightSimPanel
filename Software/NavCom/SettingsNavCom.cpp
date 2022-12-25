@@ -52,6 +52,7 @@ void SettingsNavCom::Save()
     strncpy(rSettings.acWiFiSSID, m_acWiFiSSID, sizeof(rSettings.acWiFiSSID));
     strncpy(rSettings.acWiFiPass, m_acWiFiPass, sizeof(rSettings.acWiFiPass));
     rSettings.uiOBS             = m_uiOBS;
+    rSettings.uiHDG             = m_uiHDG;
     // IMPORTANT!!! When new setting is added, it has to be added here too
     // IMPORTANT!!! And don't forfet to add it to Initialize() function if you
     //              want it to be initialized with factory reset
@@ -98,6 +99,7 @@ void SettingsNavCom::CopyToVariables(settings_t *pSettings)
     strncpy(m_acWiFiSSID, pSettings->acWiFiSSID, sizeof(m_acWiFiSSID));
     strncpy(m_acWiFiPass, pSettings->acWiFiPass, sizeof(m_acWiFiPass));
     m_uiOBS             = pSettings->uiOBS;
+    m_uiHDG             = pSettings->uiHDG;
     // IMPORTANT!!! When new setting is added, it has to be added here too
 }
 

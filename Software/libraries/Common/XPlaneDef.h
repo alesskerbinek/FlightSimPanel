@@ -62,6 +62,7 @@ enum DataRefs {
     drAdf2StandbyFreq,
     drCom1Power,
     drXpdrCode,
+    drAutopilotHeading,
 };
 
 // --------------------------------------------------------------------
@@ -106,6 +107,8 @@ enum Commands {
     cmNav1ObsDown,
     cmNav2ObsUp,
     cmNav2ObsDown,
+    cmAutopilotHdgUp,
+    cmAutopilotHdgDown,
     cmXpdrX000Up,
     cmXpdrX000Down,
     cmXpdr0X00Up,

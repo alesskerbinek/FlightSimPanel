@@ -105,6 +105,13 @@ void NetworkNavCom::ParseDREF(uint8_t* pBuffer)
             m_pModel->SetStandbyValue(fValue);
         }
     }
+    else if(m_pModel && (m_pModel->GetUnitType() == utVOR1 || m_pModel->GetUnitType() == utVOR2))
+    {
+        if(strncmp((char*)pBuffer+9, GetDataRefString(xplane::drAutopilotHeading), 29) == 0) { // TODO size??????
+            memcpy(&fValue, &(pBuffer[5]), sizeof(fValue));
+            m_pModel->GetSettings()->SetHDG(roundf(fValue));
+        }
+    }
 }
 
 // ----------------------------------------------------------------------------

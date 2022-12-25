@@ -62,6 +62,15 @@ private:
     //! Sets unit volume value
     void SetVolume(uint8_t uiVol);
 
+    //! Sets unit OBS value
+    void SetOBS(uint16_t uiObs);
+
+    //! Sets unit heading bug value
+    void SetHDG(uint16_t uiHdg);
+
+    //! Sets unit volume value
+    void SetAuxValue(uint16_t uiVal, uint8_t ch1, uint8_t ch2, uint8_t ch3);
+
     //! Sets time in format "mm:ss"
     void SetTime(uint32_t uiSecs);
 

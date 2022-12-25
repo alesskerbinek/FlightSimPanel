@@ -116,7 +116,13 @@ void Output::UpdateValues()
         case utVOR2:
             if(m_pModel->GetUnitMode() != gmOff) {
                 SetActiveMHz(m_pModel->GetActiveValue(), false);
-                SetStandbyMHz(m_pModel->GetStandbyValue(), false);
+                if(m_pModel->IsHDGCommand()) {
+                    SetHDG(m_pModel->GetHDG());
+                } else if(m_pModel->IsOBSCommand()) {
+                    SetOBS(m_pModel->GetOBS());
+                } else {
+                    SetStandbyMHz(m_pModel->GetStandbyValue(), false);
+                }
             } else {
                 SetDisplayOff();
             }
@@ -320,14 +326,35 @@ void Output::SetDisplayOff()
 
 void Output::SetVolume(uint8_t uiVol)
 {
+    SetAuxValue(uiVol, CH_V, CH_O, CH_L);
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetOBS(uint16_t uiObs)
+{
+    SetAuxValue(uiObs, CH_O, CH_B, CH_S);
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetHDG(uint16_t uiHdg)
+{
+    SetAuxValue(uiHdg, CH_H, CH_D, CH_G);
+}
+
+// -------------------------------------------------------------------------
+
+void Output::SetAuxValue(uint16_t uiVal, uint8_t ch1, uint8_t ch2, uint8_t ch3)
+{
     if(DIGIT_COUNT >= 12)
     {
-        m_auiDigitValues[11] = m_auiChars[uiVol % 10];
-        m_auiDigitValues[10] = uiVol >= 10 ? m_auiChars[uiVol/10 % 10] : CH_SPACE;
-        m_auiDigitValues[9]  = uiVol >= 100 ? m_auiChars[uiVol/100 % 10] : CH_SPACE;
-        m_auiDigitValues[8]  = CH_L;
-        m_auiDigitValues[7]  = CH_O;
-        m_auiDigitValues[6]  = CH_V;
+        m_auiDigitValues[11] = m_auiChars[uiVal % 10];
+        m_auiDigitValues[10] = uiVal >= 10 ? m_auiChars[uiVal/10 % 10] : CH_SPACE;
+        m_auiDigitValues[9]  = uiVal >= 100 ? m_auiChars[uiVal/100 % 10] : CH_SPACE;
+        m_auiDigitValues[8]  = ch3;
+        m_auiDigitValues[7]  = ch2;
+        m_auiDigitValues[6]  = ch1;
     }
 }
 

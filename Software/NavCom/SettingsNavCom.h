@@ -53,6 +53,14 @@ public:
         void SetOBS(uint16_t uiValue)
         {   m_uiOBS = uiValue; }
 
+        //! Returns current HDG bug value on display
+        uint16_t GetHDG() const
+        {   return m_uiHDG; }
+
+        //! Sets current HDG bug value on display
+        void SetHDG(uint16_t uiValue)
+        {   m_uiHDG = uiValue; }
+
         //! Returns this unit type
         UnitTypes GetUnitType()
         {   return m_eUnitType; }
@@ -77,6 +85,9 @@ protected:
 
         //! Last OBS value
         uint16_t m_uiOBS = 0;
+
+        //! Last HDG bug value
+        uint16_t m_uiHDG = 0;
 
         //! This unit type
         UnitTypes m_eUnitType = utUndefined;

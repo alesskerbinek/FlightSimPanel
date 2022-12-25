@@ -197,6 +197,64 @@ bool ModelNavCom::IsVolumeCommand()
 
 //-----------------------------------------------------------------------------
 
+uint16_t ModelNavCom::GetOBS() const
+{
+    return m_pSetNavCom->GetOBS();
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetOBS(int16_t iValue)
+{
+    m_pSetNavCom->SetOBS((iValue+360)%360);
+    m_uiOBSTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+bool ModelNavCom::IsOBSCommand()
+{
+    return (m_uiOBSTimestamp > 0 && helper::GetTimeDifference(m_uiOBSTimestamp) < 2000);
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetOBSFinished()
+{
+    m_uiOBSTimestamp = 0;
+}
+
+//-----------------------------------------------------------------------------
+
+uint16_t ModelNavCom::GetHDG() const
+{
+    return m_pSetNavCom->GetHDG();
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetHDG(int16_t iValue)
+{
+    m_pSetNavCom->SetHDG((iValue+360)%360);
+    m_uiHDGTimestamp = helper::GetTime();
+}
+
+//-----------------------------------------------------------------------------
+
+bool ModelNavCom::IsHDGCommand()
+{
+    return (m_uiHDGTimestamp > 0 && helper::GetTimeDifference(m_uiHDGTimestamp) < 2000);
+}
+
+//-----------------------------------------------------------------------------
+
+void ModelNavCom::SetHDGFinished()
+{
+    m_uiHDGTimestamp = 0;
+}
+
+//-----------------------------------------------------------------------------
+
 bool ModelNavCom:: IsEditingDigit() const
 {
     return GetEditingDigit().first <= GetEditingDigit().second;
